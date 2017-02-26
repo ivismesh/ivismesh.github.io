@@ -48,6 +48,8 @@ d3.csv("mtrees.csv", function(error, data) {
     d.y = +d.y;
   });*/
 
+  console.time("load time")
+  
   // Compute the scales’ domains.
   x.domain(d3.extent(data, function(d) { return 90; })).nice();
   y.domain(d3.extent(data, function(d) { return 90; })).nice();
@@ -73,6 +75,8 @@ d3.csv("mtrees.csv", function(error, data) {
 		var a = Math.random()*90;
 		var b = Math.random()*90;
 		return "translate(" + x(a) + "," + y(b) + ")"; });
+	
+	console.timeEnd("load time");
 });
 
 </script>
