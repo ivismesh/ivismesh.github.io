@@ -43,14 +43,14 @@ d3.csv("data.csv", function(error, data) {
   if (error) throw error;
 
   // Coerce the strings to numbers.
-  data.forEach(function(d) {
+  /*data.forEach(function(d) {
     d.x = +d.x;
     d.y = +d.y;
-  });
+  });*/
 
   // Compute the scales’ domains.
-  x.domain(d3.extent(data, function(d) { return d.x; })).nice();
-  y.domain(d3.extent(data, function(d) { return d.y; })).nice();
+  x.domain(d3.extent(data, function(d) { return 90; })).nice();
+  y.domain(d3.extent(data, function(d) { return 90; })).nice();
 
   // Add the x-axis.
   svg.append("g")
@@ -69,7 +69,7 @@ d3.csv("data.csv", function(error, data) {
     .enter().append("path")
       .attr("class", "point")
       .attr("d", d3.svg.symbol().type("triangle-up"))
-      .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+      .attr("transform", function(d) { return "translate(" + x(Math.random()*10) + "," + y(Math.random()*10) + ")"; });
 });
 
 </script>
