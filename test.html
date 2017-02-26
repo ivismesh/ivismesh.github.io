@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+</style>
+
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
+
+<script>
+console.time("totalTime:");
+d3.csv("https://github.com/ivismesh/ivismesh.github.io/blob/master/mtrees.csv")
+    .on("progress", function(evt) {
+        console.log("Amount loaded: " + evt.loaded)
+    })
+    .get(function(data) {
+        console.timeEnd("totalTime:");
+    });
+	
+</script>
