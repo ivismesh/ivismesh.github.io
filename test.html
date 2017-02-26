@@ -71,10 +71,7 @@ d3.csv("mtrees.csv", function(error, data) {
     .enter().append("path")
       .attr("class", "point")
       .attr("d", d3.svg.symbol().type("triangle-up"))
-      .attr("transform", function(d) {
-		var a = Math.random()*90;
-		var b = Math.random()*90;
-		return "translate(" + x(5) + "," + y(5) + ")"; });
+      .attr("transform", function(d) {return "translate(" + x(5) + "," + y(5) + ")"; });
 	
 	console.timeEnd("load time");
 });
