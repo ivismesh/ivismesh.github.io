@@ -74,7 +74,7 @@ d3.csv("mtrees.csv", function(error, data) {
       .attr("transform", function(d) {
 		var a = Math.random()*90;
 		var b = Math.random()*90;
-		return "translate(" + x(function(d) {return Math.random()*90}) + "," + y(function(d) {return Math.random()*90}) + ")"; });
+		return "translate(" + x(200) + "," + y(100) + ")"; });
 	
 	console.timeEnd("load time");
 });
