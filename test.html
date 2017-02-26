@@ -9,7 +9,7 @@
 
 <script>
 console.time("totalTime:");
-d3.csv("https://github.com/ivismesh/ivismesh.github.io/blob/master/mtrees.csv")
+d3.csv("mtrees.csv")
     .on("progress", function(evt) {
         console.log("Amount loaded: " + evt.loaded)
     })
