@@ -69,7 +69,7 @@ d3.csv("mtrees.csv", function(error, data) {
     .enter().append("path")
       .attr("class", "point")
       .attr("d", d3.svg.symbol().type("triangle-up"))
-      .attr("transform", function(d) { Console.log(Math.random()*90);return "translate(" + x(Math.random()*90) + "," + y(Math.random()*90) + ")"; });
+      .attr("transform", function(d) { console.log(Math.random()*90);return "translate(" + x(Math.random()*90) + "," + y(Math.random()*90) + ")"; });
 });
 
 </script>
