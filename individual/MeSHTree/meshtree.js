@@ -3,7 +3,7 @@
 let meshTree = meshRoot(); // key: tnode, value: {name: desc., parent: tnode, children: [tnode]}
 let descNodes = []; // key: desc., value: list of nodes
 
-d3.tsv("/public_html/MeSHTree/data/mtrees2017.tsv", function(error, data) {
+d3.tsv("./data/mtrees2017.tsv", function(error, data) {
   // console.log(data);
   data.forEach(function(d) {
     // descNode
@@ -118,6 +118,10 @@ function drawSVG(treeData) {
         .attr("transform", function(d) {
           return "translate(" + source.y0 + "," + source.x0 + ")";
       })
+      .each(function(d) { // delete root from vis TODO: fix positions
+        if (d.data.name == "MeSH")
+          d3.select(this).remove();
+        })
       .on('click', click);
 
     // Add Circle for the nodes
@@ -126,11 +130,7 @@ function drawSVG(treeData) {
         .attr('r', 1e-6)
         .style("fill", function(d) {
             return d._children ? "lightsteelblue" : "#ccc";
-        })
-        .each(function(d) {
-          if (d.data.name == "MeSH")
-            d3.select(this).remove();
-          });
+        });
 
     // Add labels for the nodes
     /*nodeEnter.append('text')
