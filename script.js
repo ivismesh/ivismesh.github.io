@@ -1,9 +1,11 @@
+// Load placeholder image if profile picture is missing
 function imgError(image) {
     image.onerror = "";
     image.src = "img/placeholder.png";
     return true;
 }
 
+// Smooth scrolling when clicking on a menu item
 $(document).ready(function(){
   // Add smooth scrolling to all links in navbar + footer link
   $(".navbar a, footer a[href='#myPage']").on('click', function(event) {
@@ -26,15 +28,8 @@ $(document).ready(function(){
       });
     } // End if
   });
-  
-  $(window).scroll(function() {
-    $(".slideanim").each(function(){
-      var pos = $(this).offset().top;
 
-      var winTop = $(window).scrollTop();
-        if (pos < winTop + 600) {
-          $(this).addClass("slide");
-        }
-    });
-  });
-})
+// Close collapse menu on click
+$('.navbar-collapse ul li a').click(function() {
+  $('.navbar-toggle:visible').click();
+});
