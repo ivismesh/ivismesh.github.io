@@ -7,18 +7,18 @@ var x = d3.scale.linear()
 
 var y = d3.scale.linear()
     .range([height, 0]);
-
+/*
 var svg = d3.select("#chartDiv").append("svg")
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
-	.append("g")
+	.append("g");
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+*/
 
 
 
 
-
-function draw() {
+function draw(searchTerm) {
 	
 	//Start timer to measure loading time.
 	console.time("Data file load time");
@@ -34,7 +34,7 @@ function draw() {
 		console.timeEnd("Data file load time");
 		
 		//The search term.
-		var string = "Rhinitis";
+		var string = searchTerm;
 		
 		//The paths we have to check.
 		var paths = [];
@@ -166,22 +166,36 @@ function draw() {
 		//Create a circle for each node.
 		nodes.forEach(function(d) {
 			console.log(d);
-			g.setNode(d, {shape: "circle", style: "fill: white"});
+			g.setNode(d, {shape: "circle", style: "stroke: black; fill: white"});
 		});
 		
 		//Create a line for each edge. This part still works like crap.
 		links.forEach(function(d) {
 			console.log(d.from + " -> " + d.to);
-			g.setEdge(d.from, d.to, {});
+			g.setEdge(d.from, d.to, {style: "stroke: black; fill: white"});
 		});
 		
 		var svg = d3.select("svg"),
 			inner = svg.select("g");
 		
+		// Set up zoom support
+		var zoom = d3.behavior.zoom().on("zoom", function() {
+			  inner.attr("transform", "translate(" + d3.event.translate + ")" +
+										  "scale(" + d3.event.scale + ")");
+			});
+		svg.call(zoom);
+		
 		// Create the renderer
 		var render = new dagreD3.render();
 		
 		render(inner, g);
+		
+		var initialScale = 0.75;
+		zoom
+		  .translate([(svg.attr("width") - g.graph().width * initialScale) / 2, 20])
+		  .scale(initialScale)
+		  .event(svg);
+		svg.attr('height', g.graph().height * initialScale + 40);
 		
 		//Old code from trying to use d3 to render nodes.
 		/*
@@ -202,4 +216,9 @@ function draw() {
 	});
 }
 
-draw();
+function search() {
+	var searchTerm = document.getElementById("textbox").value;
+	draw(searchTerm);
+}
+
+//draw();

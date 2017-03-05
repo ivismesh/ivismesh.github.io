@@ -8,6 +8,7 @@
 	<meta name="description" content="Mesh 2.0">
 	<meta name="author" content="IVIS17 Group 8">
 	<link rel="stylesheet" type="text/css" href="style.css">
+	
 </head>
 
 <body>
@@ -18,13 +19,15 @@
 		<div id="wrapper">
 			<div id="searchform">
 				<input type="search" class="form-control" id="textbox" name="searchterm"/>
-				<button type="submit" id="searchButton">S&ouml;k</button>
+				<button id="searchButton" onclick="search()">S&ouml;k</button>
 			</div>
 		</div>
 	</div>
-	<div id="chartDiv"></div>
+	
+	<div id="chartDiv"><svg width=960 height=600><g/></svg></div>
 	<script src="dagre-d3.js"></script>
 	<script src="https://d3js.org/d3.v3.js"></script>
 	<script src="script.js" type="text/javascript"></script>
+	
 </body>
 </html>
