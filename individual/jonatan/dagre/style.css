@@ -1,0 +1,48 @@
+html, body {
+	margin: 0px;
+	padding 0px;
+}
+
+header {
+	background-color: #b0ca3b;
+}
+
+#chartDiv {
+	margin: auto;
+	text-align: center;
+}
+
+#searchBar {
+	background-color: #b0ca3b;
+}
+
+#wrapper{
+	margin: auto;
+	width: 500px;
+	padding: 12px;
+}
+
+#searchform{
+	background: white;
+}
+
+#textbox{
+	width: 350px;
+	height: 35px;
+	border: none;
+	font-size: 18px;
+	display: inline;
+}
+
+#searchButton{
+	margin: 2px;
+	display: inline-block;
+	height:35px;
+	font-size:18px;
+	background-color:#b0ca3b;
+	color:#030;
+	border:none;
+	text-transform:uppercase;
+	border-radius:0;
+	width:25%
+}
