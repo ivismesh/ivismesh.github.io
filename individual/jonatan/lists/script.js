@@ -83,7 +83,7 @@ function draw(searchTerm) {
 		var nPaths = nodes.length;
 		
 		//Horizontal padding.
-		var horPadding = width / (nPaths + 1);
+		var horPadding = (width / (nPaths + 1)) + 35;
 		
 		//Vertical padding.
 		var vertPadding = 50;
