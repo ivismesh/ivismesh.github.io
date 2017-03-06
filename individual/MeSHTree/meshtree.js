@@ -1,324 +1,362 @@
 // meshtree.js
+var meshTree; // key: tnode, value: {name: desc., parent: tnode, children: [tnode]}
+var descNodes; // key: desc., value: list of nodes
+var trees = {};
 
-let meshTree = meshRoot(); // key: tnode, value: {name: desc., parent: tnode, children: [tnode]}
-let descNodes = []; // key: desc., value: list of nodes
+// Svg dimensions and margins
+var margin = {top: 20, right: 20, bottom: 20, left: 60},
+width = 1000 - margin.right - margin.left,
+height = 580 - margin.top - margin.bottom;
 
-d3.tsv("./data/mtrees2017.tsv", function(error, data) {
-  // console.log(data);
-  data.forEach(function(d) {
-    // descNode
-    let descid = d.desc.replace(/ /g, '').toLowerCase();
-    if(!descNodes[descid]) descNodes[descid] = [];
-    descNodes[descid].push(d.tnode);
+var svgInit = d3.select("body").append("svg")
+.attr("width", width + margin.right + margin.left)
+.attr("height", height + margin.top + margin.bottom);
 
-    // meshTree
-    let path = d.tnode.split('.');
-
-    function treePath(node, depth) {
-      if(depth == path.length) {
-        node.name = d.desc;
-        return;
-      }
-      let subpath = path.slice(0, depth+1).join('.');
-      if(!node.children) node["children"] = [];
-      if(!node.children[subpath]) node.children[subpath] = {"name": ""};
-      treePath(node.children[subpath], depth+1);
-    }
-    treePath(meshTree.children[path[0].charAt(0).toUpperCase()], 0);
+// data load
+$.getJSON('./data/MeSHTree.json', function(data) {
+  // TODO ? load indicator that exits in dataReady()
+  meshTree = data;
+  $.getJSON('./data/descNodes.json', function(data2) {
+    descNodes = data2;
+    dataReady();
   });
-  console.log(descNodes);
-  console.log(meshTree);
-  let fTree = formatTree(meshTree, "root");
-  console.log(fTree);
-  drawSVG(fTree);
 });
 
-function formatTree(tNode, adress) {
-  let retNode = {"name": tNode.name, "adress": adress};
-  if(tNode.children) {
-    retNode["children"] = [];
-    for(child in tNode.children) {
-      retNode.children.push(formatTree(tNode.children[child], child));
+/********************* ASYNC WITH DATALOAD **********************/
+
+/******************* END ASYNC WITH DATALOAD *********************/
+
+function dataReady() {
+  console.log(meshTree);
+
+  // input form button
+  $("#searchButton").click(function(e) {
+    e.preventDefault();
+    search($("#searchText").val());
+  });
+  // input form
+  $("#searchForm").bind('keydown', e => enterKey(e));
+  function enterKey(e) {
+    if(e.keyCode == 13) {
+      e.preventDefault();
+      search($("#searchText").val());
     }
   }
-  return retNode;
+
+  // Welcome tree
+  for(child in meshTree.children) {
+    let treeName = meshTree.children[child].address.slice(0,1);
+    trees[treeName] = new treeRoot(
+      meshTree.children[child], // treeData
+      null, // search term (hopefully descriptor or null)
+      width-360-200*Math.cos(Math.PI/2+child*Math.PI/8),  // tree width
+      height-Math.abs(200*Math.PI/2+child*Math.PI/8), // tree height
+      180+100*Math.cos(Math.PI/2+child*Math.PI/8), // offset in width position
+      100*Math.sin(Math.PI/2+child*Math.PI/8), // offset in height
+      child*(360/meshTree.children.length));
+    trees[treeName].collapse(trees[treeName].root);
+    trees[treeName].update(trees[treeName].root);
+  }
+
+  // focus on search bar
+  $("#searchText").focus();
 }
 
-function drawSVG(treeData) {
-  // Set the dimensions and margins of the diagram
-  var margin = {top: 20, right: 90, bottom: 30, left: 90},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+function search(string) {
+  // search result trees
+  let descKey = string.replace(/ /g, '').toLowerCase();
+  let growNodes = descNodes[descKey];
+  let nodeResult = {};
 
+  for(node in growNodes) {
+    let tKey = growNodes[node].slice(0,1);
+    if(!nodeResult[tKey]) nodeResult[tKey] = [];
+    nodeResult[tKey].push(growNodes[node]);
+  }
+
+  // collapse all
+  for(tree in trees) {
+    trees[tree].collapse(trees[tree].root);
+  }
+  // grow
+  for(treeKey in nodeResult) {
+    trees[treeKey].expand(nodeResult[treeKey]);
+  }
+  // update
+  for(tree in trees) {
+    trees[tree].update(trees[tree].root);
+  }
+
+  // search result query
+  makeQuery(string);
+}
+
+function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
   // append the svg object to the body of the page
   // appends a 'group' element to 'svg'
   // moves the 'group' element to the top left margin
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.right + margin.left)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate("
-            + margin.left + "," + margin.top + ")");
+  this.w = w;
+  this.h = h;
+  this.offsetX = offsetX;
+  this.offsetY = offsetY;
+  this.growNodes = gNodes;
+  if(!h) this.h = 0;
+  if(!w) this.w = 0;
+  if(!offsetX) this.offsetX = 0;
+  if(!offsetY) this.offsetY = 0;
 
-  var i = 0,
-      duration = 500,
-      delay = 250,
-      root;
+  this.svg = svgInit.selectAll('g.'+treeData.address.slice(0,1)).data([1]).enter()
+    .append('g').attr('class', treeData.address.slice(0,1))
+    .attr('transform', 'translate(' + (margin.left+this.offsetX) + ',' + (margin.top+this.offsetY+(height-this.h)/2) + ')');
 
-  // declares a tree layout and assigns the size
-  var treemap = d3.tree().size([height, width]);
+  this.i = 0, // not used
+  this.duration = 500,
+  this.delay = 150;
 
   // Assigns parent, children, height, depth
-  root = d3.hierarchy(treeData, function(d) { return d.children; });
-  root.x0 = height / 2;
-  root.y0 = 0;
+  this.root = d3.hierarchy(treeData, function(d) { return d.children; });
+  this.root.x0 = this.h/2;
+  this.root.y0 = 0;
 
-  // Collapse after the second level
-  root.children.forEach(collapse);
+  // declares a tree layout and assigns the size
+  this.treemap = d3.tree().size([h, w]);
 
-  update(root);
-
-  // Collapse the node and all it's children
-  function collapse(d) {
-    if(d.children) {
-      d._children = d.children
-      d._children.forEach(collapse)
-      d.children = null
+  this.expand = function(arr) {
+    for(addr in arr) {
+      this.grow(this.root, arr[addr]);
     }
   }
 
-  function update(source) {
+  // Collapse the node and all it's children
+  this.collapse = function(d) {
+    //console.log("collapsing: " + d.data.address);
+    if(d.children) {
+      if(!d._children) d._children = d.children;
+      else {
+        for(var child in d.children) {
+          d._children.push(d.children[child]);
+        }
+      }
+      for(var child in d._children) {
+        this.collapse(d._children[child]);
+      }
+      d.children = null;
+    }
+  };
 
-    // Assigns the x and y position for the nodes
-    var treeData = treemap(root);
+  // Grow to/reach addr
+  this.grow = function(d, addr) {
+    /*console.log("growing: " + d.data.address + ' to ' + addr);
+    console.log(d);*/
+    if(d.data.address == addr) {
+      if(d._children) {
+        if(!d.children) d.children = d._children;
+        else {
+          for(var child in d._children) {
+            d.children.push(d._children[child]);
+          }
+        }
+      }
+      d._children = null;
+      return;
+    }
+
+    else if(addr.length > d.data.address.length) {
+      let subPath = addr.slice(0, d.data.address.length);
+      if(d._children) {
+        if(!d.children) d.children = [];
+        for(var child in d._children) {
+          if(d._children[child].data.address == addr.slice(0, d._children[child].data.address.length)) {
+            d.children.push(d._children[child]);
+            delete d._children[child];
+          }
+        }
+      }
+      if(d._children == []) d._children = null;
+      if(d.children) {
+        for(var child in d.children) {
+          if(d.children[child].data.address == addr.slice(0, d.children[child].data.address.length)) {
+            this.grow(d.children[child], addr);
+          }
+        }
+      }
+    }
+  }
+
+  this.update = function(source) {
+    /*console.log("updating " + source.data.address + ":");
+    console.log(source);*/
+    // set x, y, depth, parent
+    var treeData = this.treemap(this.root);
 
     // Compute the new tree layout.
     var nodes = treeData.descendants(),
-        links = treeData.descendants().slice(1);
+    links = treeData.descendants().slice(1);
 
-    var rootOffset = 0;
-    console.log(rootOffset);
-
-    // Normalize for fixed-depth.
-    //nodes.forEach(function(d){ d.y = d.depth * 180});
+    nodes.forEach(function(d) {
+      // Normalize for fixed-depth.
+      //d.y = d.depth * 100;
+      if(d.depth == 0) {
+        d.x = d.x0; // root in place
+      }
+    });
 
     // color function
     let cScale = d3.scaleOrdinal()
-      .domain(["A","B","C","D","E","F","G","H","I","J","K","L","M","N","V","Z","root"])
-      .range(d3.schemeCategory20);
-    // ****************** Nodes section ***************************
+    .domain(["A","B","C","E","D","F","G","H","I","J","K","L","M","N","V","Z"])
+    .range(d3.schemeCategory10);
 
+    // ****************** Nodes section ***************************
     // Update the nodes...
-    var node = svg.selectAll('g.node')
-        .data(nodes, function(d) {return d.id || (d.id = ++i); });
+    var node = this.svg.selectAll('g.node')
+    .data(nodes, function(d) { return d.data.address; });
 
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append('g')
-        .attr('class', 'node')
-        .attr("transform", function(d) {
-          return "translate(" + source.y0 + "," + source.x0 + ")";
-      })
-      .each(function(d) { // delete root from vis TODO: fix positions
-        if (d.data.name == "MeSH")
-          d3.select(this).remove();
-        })
-      .on('click', click);
+    .attr('class', 'node')
+    .attr("transform", function(d) {
+      return "translate(" + source.y0 + "," + source.x0 + ")";
+    })
+    .on('click', click);
 
     // Add Circle for the nodes
     nodeEnter.append('circle')
-        .attr('class', 'node')
-        .attr('r', 1e-6)
-        .style("fill", function(d) {
-            return d._children ? "lightsteelblue" : "#ccc";
-        });
+    .attr('class', 'node')
+    .attr('r', 1e-6)
+    .style('stroke', d => cScale(d.data.address.slice(0,1)))
+    .style("fill", function(d) {
+      return d._children ? "lightsteelblue" : "#ccc";
+    });
 
     // Add labels for the nodes
-    /*nodeEnter.append('text')
-        .attr("dy", ".35em")
-        .attr("x", function(d) {
-            return d.children || d._children ? -13 : 13;
-        })
-        .attr("text-anchor", function(d) {
-            return d.children || d._children ? "end" : "start";
-        })
-        .text(function(d) { return d.data.name; });*/
+    nodeEnter.append('rect')
+    .attr('transform', 'translate(-15, -15), rotate(130 15 15)')
+    .attr('rx', "15")
+    .style('stroke', d => cScale(d.data.address.slice(0,1)))
+    .style('stroke-width', 2)
+    .style('fill', 'none')
+    .attr('opacity', 0.2)
+    .attr('visibility', d => (d.depth == 0) ? "show" : "hidden")
+    .attr("width", "30")
+    .attr("height", "150")
+    .text(d => d.data.name);
+
+    // Add labels for the nodes
+    nodeEnter.append('text')
+    .attr('transform', 'translate(-130, 7), rotate(40, 130, 7)')
+    .attr('opacity', 1)
+    .attr('visibility', d => (d.depth == 0) ? "show" : "hidden")
+    .text(function(d) { return d.data.name.slice(0, 17); });
 
     // UPDATE
     var nodeUpdate = nodeEnter.merge(node);
 
     // Transition to the proper position for the node
     nodeUpdate.transition()
-      .duration(duration)
-      .delay(delay)
-      .attr("transform", function(d) {
-          return "translate(" + d.y + "," + d.x + ")";
-       });
+    .duration(this.duration)
+    .delay(this.delay)
+    .attr("transform", function(d) {
+      return "translate(" + d.y + "," + d.x + ")";
+    });
 
     // Update the node attributes and style
     nodeUpdate.select('circle.node')
-      .attr('r', 10)
-      .style("fill", function(d) {
-          return d._children ? "lightsteelblue" : "#fff";
-      })
-      .attr('cursor', 'pointer');
+    .attr('r', 3)
+    .style("fill", d => d._children ? cScale(d.data.address.slice(0,1)) : "#fff")
+    .style("fill-opacity", "1")
+    .attr('cursor', 'pointer');
 
 
     // Remove any exiting nodes
     var nodeExit = node.exit().transition()
-        .duration(duration)
-        .delay(delay)
-        .attr("transform", function(d) {
-            return "translate(" + source.y + "," + source.x + ")";
-        })
-        .remove();
+    .duration(this.duration)
+    .delay(this.delay)
+    .attr("transform", function(d) {
+      return "translate(" + source.y + "," + source.x + ")";
+    })
+    .remove();
 
     // On exit reduce the node circles size to 0
     nodeExit.select('circle')
-      .attr('r', 1e-6);
+    .attr('r', 1e-6);
 
     // On exit reduce the opacity of text labels
     nodeExit.select('text')
-      .style('fill-opacity', 1e-6);
+    .style('fill-opacity', 1e-6);
 
     // ****************** links section ***************************
 
     // Update the links...
-    var link = svg.selectAll('path.link')
-        .data(links, function(d) { return d.id; });
+    var link = this.svg.selectAll('path.link')
+    .data(links, function(d) { return d.data.address; });
 
     // Enter any new links at the parent's previous position.
     var linkEnter = link.enter().insert('path', "g")
-        .attr("class", "link")
-        .attr('stroke', d => cScale(d.data.adress.slice(0,1)))
-        .attr('opacity', 0.5)
-        .attr('d', function(d) {
-          var o = {x: source.x0, y: source.y0}
-          return diagonal(o, o)
-        })
-        .each(function(d) {
-          if (d.data.adress.length < 3)
-            d3.select(this).remove();
-          });
+    .attr("class", "link")
+    .attr('stroke', d => cScale(d.data.address.slice(0,1)))
+    .attr('opacity', 0.3)
+    .attr('d', function(d) {
+      var o = {x: source.x0, y: source.y0}
+      return diagonal(o, o)
+    })
+    /*.each(function(d) {
+    if (d.data.address.length < 3)
+    d3.select(this).remove();
+    })*/;
 
     // UPDATE
     var linkUpdate = linkEnter.merge(link);
 
     // Transition back to the parent element position
     linkUpdate.transition()
-        .duration(duration)
-        .delay(delay)
-        .attr('d', function(d){ return diagonal(d, d.parent) });
+    .duration(this.duration)
+    .delay(this.delay)
+    .attr('d', function(d){ return diagonal(d, d.parent) });
 
     // Remove any exiting links
     var linkExit = link.exit().transition()
-        .duration(duration)
-        .delay(delay)
-        .attr('d', function(d) {
-          var o = {x: source.x, y: source.y}
-          return diagonal(o, o)
-        })
-        .remove();
+    .duration(this.duration)
+    .delay(this.delay)
+    .attr('d', function(d) {
+      var o = {x: source.x, y: source.y}
+      return diagonal(o, o)
+    })
+    .remove();
 
     // Store the old positions for transition.
-    nodes.forEach(function(d){
+    nodes.forEach(function(d) {
       d.x0 = d.x;
       d.y0 = d.y;
     });
-
-    // Creates a curved (diagonal) path from parent to the child nodes
-    function diagonal(s, d) {
-
-      path = `M ${s.y} ${s.x}
-              C ${(s.y + d.y) / 2} ${s.x},
-                ${(s.y + d.y) / 2} ${d.x},
-                ${d.y} ${d.x}`
-
-      return path
-    }
-
-    // Toggle children on click.
-    function click(d) {
-      if (d.children) {
-          d._children = d.children;
-          d.children = null;
-        } else {
-          d.children = d._children;
-          d._children = null;
-        }
-      update(d);
-    }
   }
-}
+  // Creates a curved (diagonal) path from parent to the child nodes
+  function diagonal(s, d) {
 
-function makeQuery(string) {
-  var endpointUri = "https://id.nlm.nih.gov/mesh/sparql";
-  var query = [
-    "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
-    "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>",
-    "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>",
-    "PREFIX owl: <http://www.w3.org/2002/07/owl#>",
-    "PREFIX meshv: <http://id.nlm.nih.gov/mesh/vocab#>",
-    "PREFIX mesh: <http://id.nlm.nih.gov/mesh/>",
-    "PREFIX mesh2015: <http://id.nlm.nih.gov/mesh/2015/>",
-    "PREFIX mesh2016: <http://id.nlm.nih.gov/mesh/2016/>",
-    "PREFIX mesh2017: <http://id.nlm.nih.gov/mesh/2017/>",
+    path = `M ${s.y} ${s.x}
+    C ${(s.y + d.y) / 2} ${s.x},
+    ${(s.y + d.y) / 2} ${d.x},
+    ${d.y} ${d.x}`
 
-    "SELECT ?d ?dName ?c ?cName ",
-    "FROM <http://id.nlm.nih.gov/mesh>",
-    "WHERE {",
-    "?d a meshv:Descriptor .",
-    "?d meshv:concept ?c .",
-    "?d rdfs:label ?dName .",
-    "?c rdfs:label ?cName",
-    "FILTER(REGEX(?dName,'"+string+"','i') || REGEX(?cName,'"+string+"','i'))",
-    "}",
-    "ORDER BY ?d"
-  ].join(" ");
+    return path;
+  }
 
-  var queryUri = endpointUri+'?query='+encodeURIComponent(query)+'&format=json&inference=true';
-  $.getJSON(queryUri,
-    {},
-    function(data) {
-      console.log(data);
-      let orderedRes = [];
-      let binds = data.results.bindings;
-      for(b in binds) {
-        let id = binds[b].dName.value.replace(/ /g, '');
-        if(orderedRes[id] == undefined) orderedRes[id] = {'title': binds[b].dName.value, 'cname': []};
-        orderedRes[id].cname.push(binds[b].cName.value);
-      }
-
-      html = "";
-      for(d in orderedRes) {
-        html += "<ul style='list-style-type: none;'>";
-        html += "<li><b>" + orderedRes[d].title + "</b></li>";
-        for(c in orderedRes[d].cname) {
-          html += "<li>" + orderedRes[d].cname[c] + "</li>";
+  // Toggle children on click.
+  function click(d) {
+    console.log(d.data.name + ':');
+    console.log(d);
+    if(d._children) {
+      if(!d.children) d.children = d._children;
+      else {
+        for(child in d._children) {
+          d.children.push(d._children[child]);
         }
-        html += "</ul>";
       }
-      $('body').append(html);
+      d.children.sort(function(a, b) { return a.data.address.slice(a.data.address.length-3,a.data.address.length) > b.data.address.slice(b.data.address.length-3,b.data.address.length) ? 1 : -1 });
+      d._children = null;
+    } else if(d.children) {
+      d._children = d.children;
+      d.children = null;
     }
-  );
-}
-
-function meshRoot() {
-  let meshRoot = {"name": "MeSH", "children": []};
-  meshRoot.children["A"] = {"name": "Anatomy", "children": []};
-  meshRoot.children["B"] = {"name": "Organisms", "children": []};
-  meshRoot.children["C"] = {"name": "Diseases", "children": []};
-  meshRoot.children["D"] = {"name": "Chemicals and Drugs", "children": []};
-  meshRoot.children["E"] = {"name": "Analytical, Diagnostic and Therapeutic Techniques, and Equipment", "children": []};
-  meshRoot.children["F"] = {"name": "Psychiatry and Psychology", "children": []};
-  meshRoot.children["G"] = {"name": "Phenomena and Processes", "children": []};
-  meshRoot.children["H"] = {"name": "Disciplines and Occupations", "children": []};
-  meshRoot.children["I"] = {"name": "Anthropology, Education, Sociology, and Social Phenomena", "children": []};
-  meshRoot.children["J"] = {"name": "Technology, Industry, and Agriculture", "children": []};
-  meshRoot.children["K"] = {"name": "Humanities", "children": []};
-  meshRoot.children["L"] = {"name": "Information Science", "children": []};
-  meshRoot.children["M"] = {"name": "Named Groups", "children": []};
-  meshRoot.children["N"] = {"name": "Health Care", "children": []};
-  meshRoot.children["V"] = {"name": "Publication Characteristics", "children": []};
-  meshRoot.children["Z"] = {"name": "Geographicals", "children": []};
-  return meshRoot;
+    trees[d.data.address.slice(0,1)].update(d);
+  }
 }

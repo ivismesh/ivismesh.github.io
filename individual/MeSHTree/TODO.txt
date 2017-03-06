@@ -1,0 +1,15 @@
+1. data pre-load:
+	generate d3 comp json files and load these instead:
+		tree: done!
+		desc to address: done!
+
+2. data manipulations:
+	all main categories its own tree: done! var trees = {A: treeA, B: treeB...}
+	grow to to all nodes in descNode(<Descriptor>): done
+
+3. Visuals
+	lines w low opacity color indicators: done
+	small filled nodes in lines color and full opacity @ collapsed children:
+	focus circle ??:
+	text tags ??:
+	circles ??:
