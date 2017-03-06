@@ -12,19 +12,26 @@
 	<body id="page-top" data-spy="scroll">
 		<!-- NAVIGATOR -->
 		 <nav class="navbar navbar-default navbar-fixed-top">
-		  <div class="container">
+		  <div class="container-fluid">
 		    <div class="navbar-header">
+		    	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>                        
+		      </button>
 		      <a class="navbar-brand" href="#page-top">Mesh 2.0</a>
 		    </div>
-		    <ul class="nav navbar-nav navbar-right">
-		      <li><a href="#about">About</a></li>
-		      <li><a href="#team">Team</a></li>
-		    </ul>
+			    <div class="collapse navbar-collapse" id="myNavbar">
+			    <ul class="nav navbar-nav navbar-right">
+			      <li><a href="#about">About</a></li>
+			      <li><a href="#team">Team</a></li>
+			    </ul>
+			  </div>
 		  </div>
 		</nav>
 
 		<!-- ABOUT THE PROJECT -->
-		<div class="container-fluid bg-green" id="about">
+		<div class="container-fluid-padding bg-green" id="about">
 			<div class="row">
 				<div class="col-lg-8 col-lg-offset-2 text-center">
 					<h1>About the Project</h1>
@@ -36,7 +43,7 @@
 		</div>
 
 		<!-- TEAM -->
-		<div id="team" class="container-fluid text-center">
+		<div id="team" class="container-fluid-padding text-center">
 		  <h1>Team</h2>
 		  <!-- 1st row -->
 		  <div class="row">
@@ -82,7 +89,7 @@
 		</div>
 
 		<!-- FOOTER -->
-		<footer class="container-fluid text-center">
+		<footer class="container-fluid-padding text-center">
 			Some footer ~
 		</footer>
 

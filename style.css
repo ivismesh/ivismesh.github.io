@@ -7,6 +7,7 @@ body {
 }
 
 h1 {
+
 }
 
 h4 {
@@ -18,7 +19,7 @@ h4 {
 	background-color: #b0ca3b;
 }
 
-.container-fluid {
+.container-fluid-padding {
     padding: 60px 50px 50px 50px;
  }
 
@@ -34,6 +35,22 @@ h4 {
 .navbar-nav li a:hover, .navbar-nav li.active a {
   color: #870052 !important;
   background-color: #fff !important;
+}
+
+.navbar-toggle {
+	border: none;
+}
+
+.navbar-toggle:hover, .navbar-toggle:focus {
+	background-color: #FFF !important;
+}
+
+.icon-bar {
+	background-color: #FFF !important;
+}
+
+.navbar-toggle:hover > .icon-bar,  .navbar-toggle:focus > .icon-bar{
+	background-color: #870052 !important;
 }
 
 footer {

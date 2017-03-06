@@ -1,9 +1,11 @@
+// Add placeholder image for missing profile pictures
 function imgError(image) {
-    image.onerror = "";
-    image.src = "img/placeholder.png";
-    return true;
+  image.onerror = "";
+  image.src = "img/placeholder.png";
+  return true;
 }
 
+// Sliding scroll-animation when clicking on a menu item
 $(document).ready(function(){
   // Add smooth scrolling to all links in navbar + footer link
   $(".navbar a, footer a[href='#myPage']").on('click', function(event) {
@@ -27,7 +29,7 @@ $(document).ready(function(){
     } // End if
   });
   
-  $(window).scroll(function() {
+$(window).scroll(function() {
     $(".slideanim").each(function(){
       var pos = $(this).offset().top;
 
@@ -38,3 +40,8 @@ $(document).ready(function(){
     });
   });
 })
+
+// Collapse menu automatically folds up when clicking on a menu item
+$('.navbar-collapse ul li a').click(function() {
+  $('.navbar-toggle:visible').click();
+});
