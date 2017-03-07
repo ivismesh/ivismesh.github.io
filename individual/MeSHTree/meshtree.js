@@ -29,8 +29,9 @@ else {
       descNodes = data2;
       dataReady();
     });
-});
+  });
 }
+
 /********************* ASYNC WITH DATALOAD ***********************/
 
 /******************* END ASYNC WITH DATALOAD *********************/
@@ -39,12 +40,12 @@ else {
 function dataReady() {
   console.log(meshTree);
 
-  // input form button
+  // search form button onClick
   $("#searchButton").click(function(e) {
     e.preventDefault();
     search($("#searchText").val());
   });
-  // input form
+  // search form onEnter
   $("#searchForm").bind('keydown', e => enterKey(e));
   function enterKey(e) {
     if(e.keyCode == 13) {
@@ -53,19 +54,19 @@ function dataReady() {
     }
   }
 
-  // Welcome tree
+  // Welcome tree setup
   for(child in meshTree.children) {
     let treeName = meshTree.children[child].address.slice(0,1);
     trees[treeName] = new treeRoot(
       meshTree.children[child], // treeData
       null, // search term (hopefully descriptor or null)
-      width-380,  // tree width
-      height-200*Math.abs(Math.sin(child*Math.PI/8)), // tree height
-      240+100*Math.cos(child*Math.PI/8), // offset in width position
+      width-380,  // tree width (perpendicular to expand direction)
+      height-200*Math.abs(Math.sin(child*Math.PI/8)), // tree height (expand direction)
+      240+100*Math.cos(child*Math.PI/8), // offset in width
       100*Math.sin(child*Math.PI/8), // offset in height
-      child*(360/meshTree.children.length));
-    trees[treeName].collapse(trees[treeName].root);
-    trees[treeName].update(trees[treeName].root);
+      child*(360/meshTree.children.length)); // rotation
+    trees[treeName].collapse(trees[treeName].root); // collapse all
+    trees[treeName].update(trees[treeName].root); // enter/update/exit
   }
 
   // focus on search bar
@@ -165,29 +166,32 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
         if(!d.children) d.children = d._children;
         else {
           for(var child in d._children) {
-            d.children.push(d._children.splice(child, 1)[0]);
+            d.children.push(d._children[child]);
           }
         }
-        if(d._children.length == 0) d._children = null;
-        d.children.sort(function(a, b) { return a.data.address.slice(a.data.address.length-3,a.data.address.length) > b.data.address.slice(b.data.address.length-3,b.data.address.length) ? 1 : -1 });
       }
+      d._children = null;
+      return;
     }
-    else if(d.data.address.length < addr.length && d.data.address == addr.slice(0, d.data.address.length)) {
+
+    else if(addr.length > d.data.address.length) {
+      let subPath = addr.slice(0, d.data.address.length);
       if(d._children) {
         if(!d.children) d.children = [];
         for(var child in d._children) {
-          let cAddr = d._children[child].data.address;
-          if(cAddr == addr.slice(0, cAddr.length)) {
+          if(d._children[child].data.address == addr.slice(0, d._children[child].data.address.length)) {
             d.children.push(d._children.splice(child, 1)[0]);
             break;
           }
         }
         if(d._children.length == 0) d._children = null;
-        if(d.children.length == 0) d.children = null;
-        else d.children.sort(function(a, b) { return a.data.address.slice(a.data.address.length-3,a.data.address.length) > b.data.address.slice(b.data.address.length-3,b.data.address.length) ? 1 : -1 });
       }
-      for(var child in d.children) {
-        this.grow(d.children[child], addr);
+      if(d.children) {
+        for(var child in d.children) {
+          if(d.children[child].data.address == addr.slice(0, d.children[child].data.address.length)) {
+            this.grow(d.children[child], addr);
+          }
+        }
       }
     }
   }
@@ -204,7 +208,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
 
     nodes.forEach(function(d) {
       // Normalize for fixed-depth.
-      d.y = d.depth * 65;
+      //d.y = d.depth * 65;
       if(d.depth == 0) {
         d.x = d.x0; // root in place
       }
