@@ -25,7 +25,7 @@ else {
     // TODO ? load indicator that exits in dataReady()
     localStorage.setItem('MeSHTree', data);
     console.log(data);
-    meshTree = $.parseJSON(data);
+    meshTree = JSON.parse(data);
     $.getJSON('./data/descNodes.json', function(data2) {
       descNodes = data2;
       dataReady();
