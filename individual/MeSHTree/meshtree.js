@@ -1,10 +1,10 @@
 // meshtree.js
-var meshTree; // key: tnode, value: {name: desc., parent: tnode, children: [tnode]}
-var descNodes; // key: desc., value: list of nodes
-var trees = {};
+var meshTree = localStorage.getItem('MeSHTree'); // {name: 'MeSH', address: 'root', children: [16]}
+var descNodes; // key: name.replace(/ /g, '').toLowerCase(), value: list of addresses
+var trees = {}; // Key: A, B, C, ..., Z Value: treeRoot
 
 // Svg dimensions and margins
-var margin = {top: 20, right: 20, bottom: 20, left: 60},
+var margin = {top: 20, right: 20, bottom: 20, left: 20},
 width = 1000 - margin.right - margin.left,
 height = 580 - margin.top - margin.bottom;
 
@@ -12,20 +12,30 @@ var svgInit = d3.select("body").append("svg")
 .attr("width", width + margin.right + margin.left)
 .attr("height", height + margin.top + margin.bottom);
 
-// data load
-$.getJSON('./data/MeSHTree.json', function(data) {
-  // TODO ? load indicator that exits in dataReady()
-  meshTree = data;
+/************************* DATA LOAD ***************************/
+if(meshTree) {
+  meshTree = JSON.parse(meshTree);
   $.getJSON('./data/descNodes.json', function(data2) {
     descNodes = data2;
     dataReady();
   });
+}
+else {
+  $.get('./data/MeSHTree.json', function(data) {
+    // TODO ? load indicator that exits in dataReady()
+    localStorage.setItem('MeSHTree', data);
+    meshTree = JSON.parse(data);
+    $.getJSON('./data/descNodes.json', function(data2) {
+      descNodes = data2;
+      dataReady();
+    });
 });
-
-/********************* ASYNC WITH DATALOAD **********************/
+}
+/********************* ASYNC WITH DATALOAD ***********************/
 
 /******************* END ASYNC WITH DATALOAD *********************/
 
+/************************* DATA READY ****************************/
 function dataReady() {
   console.log(meshTree);
 
@@ -49,10 +59,10 @@ function dataReady() {
     trees[treeName] = new treeRoot(
       meshTree.children[child], // treeData
       null, // search term (hopefully descriptor or null)
-      width-360-200*Math.cos(Math.PI/2+child*Math.PI/8),  // tree width
-      height-Math.abs(200*Math.PI/2+child*Math.PI/8), // tree height
-      180+100*Math.cos(Math.PI/2+child*Math.PI/8), // offset in width position
-      100*Math.sin(Math.PI/2+child*Math.PI/8), // offset in height
+      width-380,  // tree width
+      height-200*Math.abs(Math.sin(child*Math.PI/8)), // tree height
+      240+100*Math.cos(child*Math.PI/8), // offset in width position
+      100*Math.sin(child*Math.PI/8), // offset in height
       child*(360/meshTree.children.length));
     trees[treeName].collapse(trees[treeName].root);
     trees[treeName].update(trees[treeName].root);
@@ -62,6 +72,7 @@ function dataReady() {
   $("#searchText").focus();
 }
 
+/**************************** SEARCH *****************************/
 function search(string) {
   // search result trees
   let descKey = string.replace(/ /g, '').toLowerCase();
@@ -73,8 +84,7 @@ function search(string) {
     if(!nodeResult[tKey]) nodeResult[tKey] = [];
     nodeResult[tKey].push(growNodes[node]);
   }
-
-  // collapse all
+  // collapse
   for(tree in trees) {
     trees[tree].collapse(trees[tree].root);
   }
@@ -105,7 +115,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
   if(!offsetX) this.offsetX = 0;
   if(!offsetY) this.offsetY = 0;
 
-  this.svg = svgInit.selectAll('g.'+treeData.address.slice(0,1)).data([1]).enter()
+  svgInit.selectAll('g.'+treeData.address.slice(0,1)).data([1]).enter()
     .append('g').attr('class', treeData.address.slice(0,1))
     .attr('transform', 'translate(' + (margin.left+this.offsetX) + ',' + (margin.top+this.offsetY+(height-this.h)/2) + ')');
 
@@ -119,7 +129,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
   this.root.y0 = 0;
 
   // declares a tree layout and assigns the size
-  this.treemap = d3.tree().size([h, w]);
+  this.treemap = d3.tree().size([this.h, this.w]);
 
   this.expand = function(arr) {
     for(addr in arr) {
@@ -137,48 +147,47 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
           d._children.push(d.children[child]);
         }
       }
+      if(d._children.length == 0) d._children = null;
+      d.children = null;
       for(var child in d._children) {
         this.collapse(d._children[child]);
       }
-      d.children = null;
     }
-  };
+  }
 
   // Grow to/reach addr
   this.grow = function(d, addr) {
     /*console.log("growing: " + d.data.address + ' to ' + addr);
     console.log(d);*/
+
     if(d.data.address == addr) {
       if(d._children) {
         if(!d.children) d.children = d._children;
         else {
           for(var child in d._children) {
-            d.children.push(d._children[child]);
+            d.children.push(d._children.splice(child, 1)[0]);
           }
         }
+        if(d._children.length == 0) d._children = null;
+        d.children.sort(function(a, b) { return a.data.address.slice(a.data.address.length-3,a.data.address.length) > b.data.address.slice(b.data.address.length-3,b.data.address.length) ? 1 : -1 });
       }
-      d._children = null;
-      return;
     }
-
-    else if(addr.length > d.data.address.length) {
-      let subPath = addr.slice(0, d.data.address.length);
+    else if(d.data.address.length < addr.length && d.data.address == addr.slice(0, d.data.address.length)) {
       if(d._children) {
         if(!d.children) d.children = [];
         for(var child in d._children) {
-          if(d._children[child].data.address == addr.slice(0, d._children[child].data.address.length)) {
-            d.children.push(d._children[child]);
-            delete d._children[child];
+          let cAddr = d._children[child].data.address;
+          if(cAddr == addr.slice(0, cAddr.length)) {
+            d.children.push(d._children.splice(child, 1)[0]);
+            break;
           }
         }
+        if(d._children.length == 0) d._children = null;
+        if(d.children.length == 0) d.children = null;
+        else d.children.sort(function(a, b) { return a.data.address.slice(a.data.address.length-3,a.data.address.length) > b.data.address.slice(b.data.address.length-3,b.data.address.length) ? 1 : -1 });
       }
-      if(d._children == []) d._children = null;
-      if(d.children) {
-        for(var child in d.children) {
-          if(d.children[child].data.address == addr.slice(0, d.children[child].data.address.length)) {
-            this.grow(d.children[child], addr);
-          }
-        }
+      for(var child in d.children) {
+        this.grow(d.children[child], addr);
       }
     }
   }
@@ -195,7 +204,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
 
     nodes.forEach(function(d) {
       // Normalize for fixed-depth.
-      //d.y = d.depth * 100;
+      d.y = d.depth * 65;
       if(d.depth == 0) {
         d.x = d.x0; // root in place
       }
@@ -208,7 +217,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
 
     // ****************** Nodes section ***************************
     // Update the nodes...
-    var node = this.svg.selectAll('g.node')
+    var node = svgInit.select('g.'+treeData.data.address.slice(0,1)).selectAll('g.node')
     .data(nodes, function(d) { return d.data.address; });
 
     // Enter any new nodes at the parent's previous position.
@@ -224,9 +233,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
     .attr('class', 'node')
     .attr('r', 1e-6)
     .style('stroke', d => cScale(d.data.address.slice(0,1)))
-    .style("fill", function(d) {
-      return d._children ? "lightsteelblue" : "#ccc";
-    });
+    .style("fill", d => d._children ? cScale(d.data.address.slice(0,1)) : "#fff");
 
     // Add labels for the nodes
     nodeEnter.append('rect')
@@ -287,7 +294,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
     // ****************** links section ***************************
 
     // Update the links...
-    var link = this.svg.selectAll('path.link')
+    var link = svgInit.select('g.'+treeData.data.address.slice(0,1)).selectAll('path.link')
     .data(links, function(d) { return d.data.address; });
 
     // Enter any new links at the parent's previous position.
@@ -342,8 +349,7 @@ function treeRoot(treeData, gNodes, w, h, offsetX, offsetY, rotate) {
 
   // Toggle children on click.
   function click(d) {
-    console.log(d.data.name + ':');
-    console.log(d);
+    console.log(d.data.name, d.data.address, d);
     if(d._children) {
       if(!d.children) d.children = d._children;
       else {

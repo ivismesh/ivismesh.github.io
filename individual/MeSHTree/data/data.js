@@ -1,6 +1,6 @@
 // data.js
 
-let meshTree = meshRoot(); // key: tnode, value: {name: desc., parent: tnode, children: [tnode]}
+let meshTree = meshRoot(); // key: tnode, value: {name: desc., address: <xxx.xxx...>, children: [tnode]}
 let descNodes = {}; // key: desc., value: list of nodes
 
 d3.tsv("./mtrees2017.tsv", function(error, data) {
