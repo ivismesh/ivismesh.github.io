@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Mesh 2.0</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<script src="https://d3js.org/d3.v3.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="visualization.css">
+	</head>
+	<body id="page-top" data-spy="scroll">
+		<!-- NAVIGATOR -->
+		 <nav class="navbar navbar-default navbar-fixed-top">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		    	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>                        
+		      </button>
+		      <a class="navbar-brand" href="#page-top">Mesh 2.0</a>
+		    </div>
+
+		    <!-- SEARCH BAR -->
+		    <div class="collapse navbar-collapse">
+				   <form id="searchForm">
+					  <div class="input-group">
+					    <input type="text" id="searchText" class="form-control" placeholder="Search">
+					    <div class="input-group-btn">
+					      <button id="searchButton" class="btn btn-default" type="button">
+					        <i class="glyphicon glyphicon-search"></i>
+					      </button>
+					    </div>
+					  </div>
+					</form>
+				</div>
+		  </div>
+		</nav>
+
+
+		<div class="container-fluid mesh-padding" id="about">
+			<div class="row">
+				<!-- VISUALIZATION -->
+				<div class="col-lg-8 col-md-9 col-sm-9">
+					<svg>
+					</svg>
+				</div>
+
+				<!--- RIGHT PANEL -->
+				<div class="col-lg-4 col-md-3 col-sm-3" id="right-panel">
+					<div class="text-box" id="description">
+						<h4>Definition</h4>
+						<p id="description">New abnormal growth of tissue. Malignant neoplasms show a greater degree of anaplasia and have the properties of invasion and metastasis, compared to benign neoplasms.
+						</p>
+					</div>
+					<div class="text-box" >
+						<h4>Synonyms</h4>
+						<p id="synonyms">Neoplasia — Neoplasias — Neoplasm — Tumors — Tumor — Benign Neoplasms — Neoplasms, Benign — Benign Neoplasm — Neoplasm, Benign — Malignancy — Malignancies — Cancer — Cancers
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="visualization.js"></script>
+	</body>
+</html>
