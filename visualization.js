@@ -110,7 +110,24 @@ d3.json("data.json", function(error, data) {
 
 
 
-
+var colors = {
+	"Anatomy": "#AA3939",
+	"Organisms": "#FFAAAA",
+	"Diseases": "#D46A6A",
+	"Chemicals and Drugs": "#801515",
+	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#550000",
+	"Psychiatry and Psychology": "#226666",
+	"Phenomena and Processes": "#669999",
+	"Disciplines and Occupations": "#407F7F",
+	"Anthropology, Education, Sociology, and Social Phenomena": "#0D4D4D",
+	"Technology, Industry, and Agriculture": "#003333",
+	"Humanities": "#7B9F35",
+	"Information Science": "#D4EE9F",
+	"Named Groups": "#A5C663",
+	"Health Care": "#567714",
+	"Publication Characteristics": "#354F00",
+	"Geographicals": "#954505"	
+}
 
 
 
@@ -125,7 +142,7 @@ function update(source) {
       links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 180; });
+  nodes.forEach(function(d) { d.y = d.depth * 320; });
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -136,15 +153,40 @@ function update(source) {
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
       .on("click", click);
-
-  nodeEnter.append("circle")
+	
+	
+	
+	//Use circles for all but first level.
+  nodeEnter.filter(function(d) {
+	  if(d.depth === 1) return false;
+	  else return true;
+	})
+	.append("circle")
       .attr("r", 1e-6)
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
-	  
+	
+	
+	
+	//Use rectangles for first level.
+	nodeEnter.filter(function(d) {
+		if(d.depth === 1) return true;
+		else return false;
+	})
+	.append("rect")
+		.attr("width", 26)
+		.attr("height", 26)
+		.attr("x", -10)
+		.attr("y", -14)
+		.attr("fill", function(d) {return colors[d.name]})
+		//.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
+
+		
 
   nodeEnter.append("text")
-      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      //.attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+	  .attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
       .text(function(d) { return d.name; })
@@ -208,6 +250,13 @@ function update(source) {
     d.y0 = d.y;
   });
   
+  d3.selectAll(".node")
+		.filter(function(a){
+			if(a.name === "Geographicals") return true;
+			else return false;
+		})
+		.attr("x", 0)
+		.attr("x0", 0);
 }
 
 
