@@ -283,7 +283,7 @@ function searchcsv(searchText) {
 function search() {
 	
 	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	var searchText = location.search.split("?searchtext=")[1];
+	var searchText = window.location.href.split("?searchtext=")[1];
 	console.log(searchText);
 	addresses = [];
 	
