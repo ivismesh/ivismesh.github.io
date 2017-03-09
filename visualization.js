@@ -5,7 +5,8 @@ var margin = {top: 20, right: 120, bottom: 20, left: 120},
 var i = 0,
     duration = 750,
     root,
-	csvdata;
+	csvdata,
+	searchText;
 
 var tree = d3.layout.tree()
     .size([height, width]);
@@ -33,8 +34,51 @@ function zoomed(){
 	svg.attr("transform", "translate(" + [tx, ty] + ")scale(" + d3.event.scale + ")");
 }
 
+//Container for the gradients
+var defs = svg.append("defs");
+
+//Filter for the outside glow
+var filter = defs.append("filter")
+	.attr("x", "-100%")
+	.attr("y", "-100%")
+	.attr("width", "300%")
+	.attr("height", "300%")
+	.attr("id","glow");
+
+filter.append("feFlood")
+	.attr("flood-color","green")
+	.attr("flood-opacity","1")
+	.attr("result","flood");
+
+filter.append("feComposite")
+	.attr("in","flood")
+	.attr("in2","SourceGraphic")
+	.attr("operator","in")
+	.attr("result","mask");
+
+filter.append("feMorphology")
+	.attr("in","mask")
+	.attr("radius","2")
+	.attr("operator","dilate")
+	.attr("result","dilated");
+	
+filter.append("feGaussianBlur")
+	.attr("in","dilated")
+	.attr("stdDeviation","3")
+	.attr("result","blurred");
+	
+var feMerge = filter.append("feMerge");
+
+feMerge.append("feMergeNode")
+	.attr("in","blurred");
+	
+feMerge.append("feMergeNode")
+	.attr("in","SourceGraphic");
 
 
+
+	
+	
 d3.json("data.json", function(error, data) {
   if (error) throw error;
 
@@ -97,6 +141,7 @@ function update(source) {
       .attr("r", 1e-6)
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
+	  
 
   nodeEnter.append("text")
       .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
@@ -112,7 +157,7 @@ function update(source) {
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
   nodeUpdate.select("circle")
-      .attr("r", 4.5)
+      .attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
       .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
 
   nodeUpdate.select("text")
@@ -257,6 +302,7 @@ function expand(root, paths) {
 					}
 				}
 			}
+		
 		}
 	}
 }
@@ -283,10 +329,11 @@ function searchcsv(searchText) {
 function search() {
 	
 	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	var searchText = window.location.href.split("?searchtext=")[1];
+	searchText = window.location.href.split("?searchtext=")[1];
 	console.log(searchText);
 	addresses = [];
 	
+	//Get the paths to the nodes.
 	var paths = searchcsv(searchText);
 	
 	console.log("Paths: ");
@@ -295,5 +342,20 @@ function search() {
 	//searchTree(root, searchText);
 	//console.log(addresses);
 	
+	//Expand the tree to the nodes.
 	expand(root, paths);
+	
+	
+	
+	
+	
+	//Apply filters.
+	d3.selectAll(".node")
+		.filter(function(a){
+			if(a.name === searchText) return true;
+			else return false;
+		})
+		.selectAll("circle")
+		.attr("r", 18)
+		.style("filter", function(d) {return "url(#glow)"});
 }
