@@ -280,7 +280,7 @@ function searchcsv(searchText) {
 
 function search() {
 	
-	var searchText = document.getElementById('searchText').value;
+	var searchText = document.getElementById("searchForm").elements["searchText"].value;
 	console.log(searchText);
 	addresses = [];
 	
