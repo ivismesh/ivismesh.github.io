@@ -54,12 +54,12 @@ d3.json("data.json", function(error, data) {
 		if (error) throw error;
 
 		csvdata = data;
+		
+		search();
 	});
 
   root.children.forEach(collapse);
   update(root);
-  
-  addresses = [];
 });
 
 
@@ -179,13 +179,15 @@ function click(d) {
     d._children = null;
   }
   update(d);
-  console.log("click function done");
 }
 
 
 
 
 
+/*
+ * Expands all paths to the searched nodes.
+ */
 function expand(root, paths) {
 	
 	var current = root;
@@ -280,7 +282,8 @@ function searchcsv(searchText) {
 
 function search() {
 	
-	var searchText = document.getElementById("searchForm").elements["searchText"].value;
+	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
+	var searchText = location.search.split("?searchtext=")[1];
 	console.log(searchText);
 	addresses = [];
 	
