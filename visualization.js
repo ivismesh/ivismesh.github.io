@@ -9,7 +9,8 @@ var i = 0,
 	searchText;
 
 var tree = d3.layout.tree()
-    .size([height, width]);
+	.nodeSize([25, 25]);
+    //.size([height, width]);
 
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
