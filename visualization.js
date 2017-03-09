@@ -277,7 +277,7 @@ function searchTree(node, searchText) {
 
 function search() {
 	
-	var searchText = $("#searchText");
+	var searchText = $("#searchText").value;
 	
 	console.log("Search: " + searchText);
 	
