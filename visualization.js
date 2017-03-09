@@ -4,7 +4,8 @@ var margin = {top: 20, right: 120, bottom: 20, left: 120},
 
 var i = 0,
     duration = 750,
-    root;
+    root,
+	csvdata;
 
 var tree = d3.layout.tree()
     .size([height, width]);
@@ -48,12 +49,24 @@ d3.json("data.json", function(error, data) {
       d.children = null;
     }
   }
+  
+  d3.csv("data.csv", function(error, data) {
+		if (error) throw error;
+
+		csvdata = data;
+	});
 
   root.children.forEach(collapse);
   update(root);
   
   addresses = [];
 });
+
+
+
+
+
+
 
 
 
@@ -173,13 +186,13 @@ function click(d) {
 
 
 
-function expand(root) {
+function expand(root, paths) {
 	
 	var current = root;
 	
-	//Each address.
-	for(var i = 0; i < addresses.length; i++) {
-		var path = addresses[i].split(".");
+	//Each path.
+	for(var i = 0; i < paths.length; i++) {
+		var path = paths[i].split(".");
 		var treeletter = path[0].slice(0,1);
 		
 		//Get the correct tree.
@@ -250,25 +263,15 @@ function expand(root) {
 
 
 
-function searchTree(node, searchText) {
-	
-	if(node.children != null) {
-		//console.log(node.children.length);
-		for(var i = 0; i < node.children.length; i++) {
-			searchTree(node.children[i]);
-			//console.log(node.children[i]);
+function searchcsv(searchText) {
+	console.log("Searching for paths to: " + searchText);
+	var paths = [];
+	csvdata.forEach(function(d) {
+		if(d.name === searchText) {
+			paths.push(d.address);
 		}
-	} else if(node._children != null) {
-		for(var i = 0; i < node._children.length; i++) {
-			searchTree(node._children[i]);
-			//console.log(node.children[i]);
-		}
-	}
-	if(node.name === searchText) {
-		addresses.push(node.address);
-		//console.log(node);
-	}
-	return;
+	});
+	return paths;
 }
 
 
@@ -277,12 +280,17 @@ function searchTree(node, searchText) {
 
 function search() {
 	
-	var searchText = $("#searchText").value;
+	var searchText = document.getElementById("searchText").value;
 	
-	console.log("Search: " + searchText);
+	addresses = [];
 	
-	searchTree(root, searchText);
-	console.log(addresses);
+	var paths = searchcsv(searchText);
 	
-	expand(root);
+	console.log("Paths: ");
+	console.log(paths);
+	
+	//searchTree(root, searchText);
+	//console.log(addresses);
+	
+	expand(root, paths);
 }
