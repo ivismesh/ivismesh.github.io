@@ -379,7 +379,7 @@ function searchcsv(searchText) {
 function search() {
 	
 	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	searchText = window.location.href.split("?searchtext=")[1];
+	searchText = window.location.href.split("?searchtext=")[1].replace(/\+/g, ' ');
 	console.log(searchText);
 	addresses = [];
 	
