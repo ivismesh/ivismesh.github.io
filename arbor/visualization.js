@@ -1,10 +1,10 @@
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = document.body.clientWidth - margin.right - margin.left,
-    height = 800 - margin.top - margin.bottom;
+    width = $("#visualization").width() - margin.right - margin.left,
+    height = $("#visualization").height() - margin.top - margin.bottom;
 
 var i = 0,
-    duration = 750,
-    root,
+  duration = 750,
+  root,
 	csvdata,
 	searchText;
 

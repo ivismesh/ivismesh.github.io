@@ -1,13 +1,16 @@
 @import url(https://fonts.googleapis.com/css?family=Lato);
+html, body, .container-fluid, .row, #visualization {
+    height: 100%;
+}
+
+#visualization {
+	padding: 10px;
+}
 
 body {
 	font: 400 15px Lato;
 	color: #303030;
 	line-height: 1.5;
-}
-
-h1 {
-
 }
 
 h4 {
@@ -82,14 +85,14 @@ form {
 #searchButton {
 	border: none;
 }
+
 .mesh-padding {
-	padding: 60px 0px 0px 0px;
+	padding-top: 60px;
 }
 
 .text-box {
   background-color: #b0ca3b;
   padding: 1em 1.3em;
   margin-bottom: 1em;
-  margin-right: 1em;
   border-radius: 6px;
 }
