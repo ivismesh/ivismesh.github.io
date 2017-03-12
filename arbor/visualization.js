@@ -112,22 +112,22 @@ d3.json("data.json", function(error, data) {
 
 
 var colors = {
-	"Anatomy": "#795548",
-	"Organisms": "#FF8F00",
-	"Diseases": "#FFC107",
-	"Chemicals and Drugs": "#FFD54F",
-	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#6A1B9A",
-	"Psychiatry and Psychology": "#9C27B0",
-	"Phenomena and Processes": "#BA68C8",
-	"Disciplines and Occupations": "#00838F",
-	"Anthropology, Education, Sociology, and Social Phenomena": "#00BCD4",
-	"Technology, Industry, and Agriculture": "#4DD0E1",
-	"Humanities": "#2E7D32",
-	"Information Science": "#4CAF50",
-	"Named Groups": "#81C784",
-	"Health Care": "#1565C0",
-	"Publication Characteristics": "#2196F3",
-	"Geographicals": "#64B5F6"	
+	"Anatomy": "#C189C4",
+	"Organisms": "#C8457F",
+	"Diseases": "#795548",
+	"Chemicals and Drugs": "#FFA500",
+	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#A63603",
+	"Psychiatry and Psychology": "#E6550D",
+	"Phenomena and Processes": "#FD8D3C",
+	"Disciplines and Occupations": "#FDBE85",
+	"Anthropology, Education, Sociology, and Social Phenomena": "#006D2C",
+	"Technology, Industry, and Agriculture": "#31A354",
+	"Humanities": "#74C476",
+	"Information Science": "#BAE4B3",
+	"Named Groups": "#08519C",
+	"Health Care": "#3182BD",
+	"Publication Characteristics": "#6BAED6",
+	"Geographicals": "#BDD7E7"	
 }
 
 
