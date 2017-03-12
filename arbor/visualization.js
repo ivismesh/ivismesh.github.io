@@ -65,7 +65,7 @@ filter.append("feMorphology")
 
 filter.append("feGaussianBlur")
 	.attr("in","dilated")
-	.attr("stdDeviation","2")
+	.attr("stdDeviation","0")
 	.attr("result","blurred");
 
 var feMerge = filter.append("feMerge");
