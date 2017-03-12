@@ -19,43 +19,10 @@ var svgInit = d3.select("body").append("svg")
 //Container for the gradients
 var defs = svgInit.append("defs");
 
-//Filter for the outside glow
-var filter = defs.append("filter")
-	.attr("x", "-100%")
-	.attr("y", "-100%")
-	.attr("width", "300%")
-	.attr("height", "300%")
-	.attr("id","glow");
-
-filter.append("feFlood")
-	.attr("flood-color","#870052")
-	.attr("flood-opacity","1")
-	.attr("result","flood");
-
-filter.append("feComposite")
-	.attr("in","flood")
-	.attr("in2","SourceGraphic")
-	.attr("operator","in")
-	.attr("result","mask");
-
-filter.append("feMorphology")
-	.attr("in","mask")
-	.attr("radius","2")
-	.attr("operator","dilate")
-	.attr("result","dilated");
-
-filter.append("feGaussianBlur")
-	.attr("in","dilated")
-	.attr("stdDeviation","3")
-	.attr("result","blurred");
-
-var feMerge = filter.append("feMerge");
-
-feMerge.append("feMergeNode")
-	.attr("in","blurred");
-
-feMerge.append("feMergeNode")
-	.attr("in","SourceGraphic");
+// color function
+let cScale = d3.scaleOrdinal()
+.domain(["A","C","B","E","D","F","G","H","I","J","K","L","M","N","V","Z"])
+.range(d3.schemeCategory10);
 
 /*var svgHeart = svgInit.append('g').attr('class', 'heart')
         .attr('transform', 'translate(150, 150) rotate(45)');
@@ -139,20 +106,6 @@ function dataReady() {
   $("#searchText").focus();
 }
 
-function forceField(nodeArr) {
-  var simulation = d3.forceSimulation(dataset.nodes)
-                     .force('charge', d3.forceManyBody())
-                     .force('link', d3.forceLink(dataset.links))
-                     .force('center', d3.forceCenter(width / 2, height / 2));
-
-
-  simulation.nodes(dataset.nodes)
-            .on('tick', ticked);
-
-  simulation.force('link')
-            .links(dataset.links);
-}
-
 /**************************** SEARCH *****************************/
 function search(string) {
   // search result trees
@@ -208,10 +161,52 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRota
   // declares a tree layout and assigns the size
   this.treemap = d3.tree().size([this.h, this.w]);
 
-  svgInit.selectAll('g.'+treeData.address.slice(0,1)).data([1]).enter()
-    .append('g').attr('class', treeData.address.slice(0,1))
+	// Add new tree group
+  svgInit.selectAll('g.root.'+treeData.address.slice(0,1)).data([1]).enter()
+    .append('g').attr('class', 'root ' + treeData.address.slice(0,1))
     .attr('transform', 'translate(' + this.offsetw + ', ' + this.offseth
       + '), rotate(' + this.treeRotation +' '+ 0 +' '+ this.h/2 + ')' );
+
+	// Add glow-filter
+	//Filter for the outside glow
+	this.filter = defs.append("filter")
+		.attr("x", "-100%")
+		.attr("y", "-100%")
+		.attr("width", "300%")
+		.attr("height", "300%")
+		.attr('id', 'glow' + treeData.address.slice(0,1));
+
+	this.filter.append("feFlood")
+		.attr("flood-color", cScale(treeData.address.slice(0,1)))
+		.attr("flood-opacity","1")
+		.attr("result","flood");
+
+	this.filter.append("feComposite")
+		.attr("in","flood")
+		.attr("in2","SourceGraphic")
+		.attr("operator","in")
+		.attr("result","mask");
+
+	this.filter.append("feMorphology")
+		.attr("in","mask")
+		.attr("radius","2")
+		.attr("operator","dilate")
+		.attr("result","dilated");
+
+	this.filter.append("feGaussianBlur")
+		.attr("in","dilated")
+		.attr("stdDeviation","3")
+		.attr("result","blurred");
+
+	this.feMerge = this.filter.append("feMerge");
+
+	this.feMerge.append("feMergeNode")
+		.attr("in","blurred");
+
+	this.feMerge.append("feMergeNode")
+		.attr("in","SourceGraphic");
+
+// TREEROOT FUNCTIONS
 
   this.expand = function(arr) {
     for(addr in arr) {
@@ -321,11 +316,6 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRota
     // root in place
     this.root.x = this.root.x0;
 
-    // color function
-    let cScale = d3.scaleOrdinal()
-    .domain(["A","C","B","E","D","F","G","H","I","J","K","L","M","N","V","Z"])
-    .range(d3.schemeCategory10);
-
     // ****************** Nodes section ***************************
     // Update the nodes...
     var node = svgInit.select('g.'+treeData.data.address.slice(0,1)).selectAll('g.node')
@@ -337,7 +327,9 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRota
     .attr("transform", function(d) {
       return "translate(" + source.y0 + "," + source.x0 + ")";
     })
-    .on('click', click);
+    .on('click', click)
+		.on('mouseover', dimAll)
+		.on('mouseout', unDimAll);
 
     // Add label frame
     nodeEnter.append('rect')
@@ -411,7 +403,7 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRota
     .delay(this.delay)
       .duration(this.duration)
       .attr('r', d => d.data.name == lastSearch ? 7.5 : 3)
-      .style('filter', d => d.data.name == lastSearch ? 'url(#glow)' : 'none');
+      .style('filter', d => d.data.name == lastSearch ? 'url(#glow' + d.data.address.slice(0,1) + ')' : 'none');
 
     // Remove any exiting nodes
     var nodeExit = node.exit().transition()
@@ -501,4 +493,14 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRota
     }
     trees[d.data.address.slice(0,1)].update(d);
   }
+
+	function dimAll(d) {
+		svgInit.selectAll('g.root').style('opacity', 0.2)
+		svgInit.select('g.root.' + d.data.address.slice(0,1)).style('opacity', 1)
+	}
+
+	function unDimAll(d) {
+		svgInit.selectAll('g.root').style('opacity', 1);
+	}
+
 }
