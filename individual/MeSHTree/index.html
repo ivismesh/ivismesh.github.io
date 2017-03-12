@@ -19,15 +19,12 @@
     stroke-width: 2px;
   }
 
-  form {
-    width: 1000px;
-  }
-
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
+    background-color: white !important;
   }
   </style>
   <!-- Latest compiled and minified CSS -->
@@ -44,15 +41,20 @@
 </head>
 
 <body>
-  <div class="row">
-    <div class="col-lg-6">
-      <div class="input-group">
-        <input id="searchText" type="text" class="form-control" placeholder="MeSH Descriptor">
-        <span class="input-group-btn">
-          <button id="searchButton" class="btn btn-primary" type="button">Search</button>
-        </span>
-      </div>
-    </div>
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <div class="input-group">
+    <input id="searchText" type="text" class="form-control" placeholder="MeSH Descriptor">
+    <span class="input-group-btn">
+      <button id="searchButton" class="btn btn-primary" type="button">Search</button>
+    </span>
   </div>
   <script type="text/javascript" src="./meshtree.js"></script>
 </body>

@@ -2,16 +2,36 @@
 var meshTree = localStorage.getItem('MeSHTree'); // {name: 'MeSH', address: 'root', children: [16]}
 var descNodes; // key: name.replace(/ /g, '').toLowerCase(), value: list of addresses
 var trees = {}; // Key: A, B, C, ..., Z Value: treeRoot
+var lastSearch;
 
 // Svg dimensions and margins
 var margin = {top: 20, right: 20, bottom: 20, left: 20},
-width = 1063 - margin.right - margin.left,
-height = 580 - margin.top - margin.bottom;
+width = Math.floor(screen.availWidth*0.7) - margin.right - margin.left,
+height = Math.floor(screen.availHeight*0.8) - margin.top - margin.bottom;
+
+d3.select('.input-group').style('width', Math.floor(screen.availWidth*0.7) + 'px');
 
 var svgInit = d3.select("body").append("svg")
 .attr("width", width + margin.right + margin.left)
 .attr("height", height + margin.top + margin.bottom)
 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+/*var svgHeart = svgInit.append('g').attr('class', 'heart')
+        .attr('transform', 'translate(150, 150) rotate(45)');
+
+svgHeart.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 150)
+        .attr('height', 150)
+        .style('fill', '#b0ca3b');
+svgHeart.selectAll('circle').data([0, 1]).enter().append('circle').attr('class', 'heart')
+        .attr('cx', (d,i) => i == 0 ? 0 : 75)
+        .attr('cy', (d,i) => i == 0 ? 75 : 0)
+        .attr('r', 75)
+        .style('fill', (d,i) => i == 0 ? '#b0ca3b' : '#ffffff')
+        .style('stroke', (d, i) => i == 0 ? ' none' : '#b0ca3b')
+        .style('stroke-width', 1);*/
 
 /************************* DATA LOAD ***************************/
 if(meshTree) {
@@ -63,12 +83,13 @@ function dataReady() {
     trees[treeName] = new treeRoot(
       meshTree.children[child], // treeData
       null, // search term (hopefully descriptor or null)
-      width-400,  // tree height (expand direction)
-      height, // tree width (perpendicular to expand direction)
-      200, // offset in width
-      22*(child-8), // offset in height
-      -12, // tree
-      12); // tag
+      width,  // tree height (expand direction)
+      height/2, // tree width (perpendicular to expand direction)
+      150, // offset in width (tree height)
+      height/3+(child - 8) * 22, // offset in height (tree width)
+      0, // tree rotation
+      180, // main tags rotation
+      160); // tags rotation
     trees[treeName].collapse(trees[treeName].root); // collapse all
     trees[treeName].update(trees[treeName].root); // enter/update/exit
   }
@@ -94,6 +115,8 @@ function forceField(nodeArr) {
 /**************************** SEARCH *****************************/
 function search(string) {
   // search result trees
+  lastSearch = string;
+
   let descKey = string.replace(/ /g, '').toLowerCase();
   let growNodes = descNodes[descKey];
   let nodeResult = {};
@@ -120,7 +143,7 @@ function search(string) {
   makeQuery(string);
 }
 
-function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotate) {
+function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRotate, tagRotate) {
   // append the svg object to the body of the page
   // appends a 'group' element to 'svg'
   // moves the 'group' element to the top left margin
@@ -128,13 +151,13 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
   this.h = h ? h : height;
   this.offseth = offseth ? offseth : 0;
   this.offsetw = offsetw ? offsetw : 0;
+  this.mainTagRotation = mTagRotate ? mTagRotate : 0;
   this.tagRotation = tagRotate ? tagRotate : 0;
   this.treeRotation = treeRotate ? treeRotate : 0;
   this.growNodes = gNodes;
-
   this.i = 0, // not used
-  this.duration = 500,
-  this.delay = 150;
+  this.duration = 400,
+  this.delay = 400;
 
   // Assigns parent, children, height, depth
   this.root = d3.hierarchy(treeData, function(d) { return d.children; });
@@ -215,6 +238,30 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
     }
   }
 
+  this.textPos = function(d) {
+    if(d.depth < 1) {
+      let angle = (this.mainTagRotation+this.treeRotation)%360;
+      let ret = (angle <= 90 || angle >= 270) ?
+      'translate(10, 5), rotate(' + this.mainTagRotation + ' -10 -5)' :
+      'rotate(180), translate(-10, 5), rotate(' + this.mainTagRotation + ' 10 -5)';
+      return ret;
+    }
+    let angle = (this.tagRotation+this.treeRotation)%360;
+    let ret = (angle <= 90 || angle >= 270) ?
+    'translate(12, 5), rotate(' + this.tagRotation + ' -12 -5)' :
+    'rotate(180), translate(-12, 5), rotate(' + this.tagRotation + ' 12 -5)';
+    return ret;
+  }
+
+  this.textAnchor = function(d) {
+    if(d.depth < 1) {
+      let angle = (this.mainTagRotation+this.treeRotation)%360;
+      return (angle <= 90 || angle >= 270) ? 'start' : 'end';
+    }
+    let angle = (this.tagRotation+this.treeRotation)%360;
+    return (angle <= 90 || angle >= 270) ? 'start' : 'end';
+  }
+
   this.update = function(source) {
     /*console.log("updating " + source.data.address + ":");
     console.log(source);*/
@@ -227,16 +274,16 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
 
     nodes.forEach(function(d) {
       // Normalize for fixed-depth.
-      //d.y = d.depth * 65;
-      if(d.depth == 0) {
-        d.x = d.x0; // root in place
-      }
+      d.y = d.depth * 95;
     });
+
+    // root in place
+    this.root.x = this.root.x0;
 
     // color function
     let cScale = d3.scaleOrdinal()
-    .domain(["A","B","C","E","D","F","G","H","I","J","K","L","M","N","V","Z"])
-    .range(d3.schemeCategory20);
+    .domain(["A","C","B","E","D","F","G","H","I","J","K","L","M","N","V","Z"])
+    .range(d3.schemeCategory10);
 
     // ****************** Nodes section ***************************
     // Update the nodes...
@@ -251,6 +298,23 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
     })
     .on('click', click);
 
+    // Add label frame
+    nodeEnter.append('rect')
+    .attr('transform', 'translate(-10, -10), rotate(' + (this.mainTagRotation) + ' 10 10)')
+    .attr('rx', "10")
+    .style('fill', 'white')
+    .style('fill-opacity', 0.6)
+    .style('stroke', d => cScale(d.data.address.slice(0,1)))
+    .style('stroke-width', 1)
+    .attr('visibility', d => (d.depth == 0) ? "show" : "hidden")
+    .attr("width", 20)
+    .attr("height", "20")
+    .attr('cursor', 'pointer')
+    .transition()
+      .duration(this.duration)
+      .delay(this.delay)
+      .attr("width", d => (d.data.name.length > 15 ? 130 : 20+d.data.name.length*9));
+
     // Add Circle for the nodes
     nodeEnter.append('circle')
     .attr('class', 'node')
@@ -258,35 +322,32 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
     .style('stroke', d => cScale(d.data.address.slice(0,1)))
     .style("fill", d => d._children ? cScale(d.data.address.slice(0,1)) : "#fff");
 
-    // Add label frame
-    nodeEnter.append('rect')
-    .attr('transform', 'translate(-10, -10), rotate(' + this.tagRotation + ' 10 10)')
-    .attr('rx', "10")
-    .style('stroke', d => cScale(d.data.address.slice(0,1)))
-    .style('stroke-width', 2)
-    .style('fill', 'white')
-    .style('fill-opacity', 0)
-    .attr('opacity', 0.6)
-    .attr('visibility', d => (d.depth == 0) ? "show" : "hidden")
-    .attr("width", "150")
-    .attr("height", "20")
-    .text(d => d.data.name)
-    .attr('cursor', 'pointer');
-
     // Add labels text
     nodeEnter.append('text')
     .attr('transform', d => this.textPos(d))
     .style('font-family', 'monospace')
-    .style('font-size', '0.9em')
-    .style('text-anchor', 'middle')
-    .style('stroke', d => cScale(d.data.address.slice(0,1)))
-    .attr('opacity', 1)
-    .attr('visibility', d => (d.depth == 0) ? "show" : "hidden")
+    .style('text-anchor', d => this.textAnchor(d))
+    .style('fill', d => (d.depth < 1) ? cScale(d.data.address.slice(0,1)) : '#0f0f0f')
+    .style('stroke', d => (d.depth < 1) ? cScale(d.data.address.slice(0,1)): 'none')
+    .style('stroke-width', 0.5)
+    .attr('visibility', d => (d.depth > -1) ? "show" : "hidden")
     .text(function(d) {
-      let nameLen = d.data.name.length;
-      return d.data.name.slice(0, 14);
+      if(d.depth == 0 && d.data.name.length > 13) {
+        return d.data.name.slice(0, 13);
+      } else if(d.depth > 0 && d.data.name.length > 13) {
+        return d.data.name.slice(0, 13);
+      }
+      return d.data.name;
     })
-    .attr('cursor', 'pointer');
+    .attr('cursor', 'pointer')
+    .attr('opacity', 0)
+    .style('font-size', d => (d.depth > 0) ? "11px" : "13px")
+    .attr('textLength', 0)
+    .transition()
+      .duration(this.duration-50)
+      .delay(this.delay+50)
+      .attr('opacity', 1)
+      .attr('textLength', d => (d.depth < 1) ? ((d.data.name.length > 13) ? 100 : d.data.name.length*7.5) : ((d.data.name.length > 13) ? 70 : d.data.name.length*6));
 
     // UPDATE
     var nodeUpdate = nodeEnter.merge(node);
@@ -304,8 +365,11 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
     .attr('r', 3)
     .style("fill", d => d._children ? cScale(d.data.address.slice(0,1)) : "#fff")
     .style("fill-opacity", "1")
-    .attr('cursor', 'pointer');
-
+    .attr('cursor', 'pointer')
+    .transition()
+    .delay(this.delay)
+    .duration(this.duration)
+    .attr('r', d => d.data.name == lastSearch ? 7.5 : 3);
 
     // Remove any exiting nodes
     var nodeExit = node.exit().transition()
@@ -316,7 +380,7 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
     })
     .remove();
 
-    // On exit reduce the node circles size to 0
+    // On exit reduce the node circles size to 0AbsorptionAbsorptionAbsorption
     nodeExit.select('circle')
     .attr('r', 1e-6);
 
@@ -334,15 +398,11 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
     var linkEnter = link.enter().insert('path', "g")
     .attr("class", "link")
     .attr('stroke', d => cScale(d.data.address.slice(0,1)))
-    .attr('opacity', 0.3)
+    .attr('opacity', 0.2)
     .attr('d', function(d) {
       var o = {x: source.x0, y: source.y0}
       return diagonal(o, o)
     })
-    /*.each(function(d) {
-    if (d.data.address.length < 3)
-    d3.select(this).remove();
-    })*/;
 
     // UPDATE
     var linkUpdate = linkEnter.merge(link);
@@ -368,13 +428,6 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, tagRotat
       d.x0 = d.x;
       d.y0 = d.y;
     });
-  }
-
-  this.textPos = function(d) {
-    let ret = (this.tagRotation+this.treeRotation <= 90 && this.tagRotation+this.treeRotation < 270) ?
-    'translate(70, 5), rotate(' + this.tagRotation + ' -70 -5)' :
-    'rotate(180), translate(-70, 5), rotate(' + this.tagRotation + ' 70 -5)';
-    return ret;
   }
 
   // Creates a curved (diagonal) path from parent to the child nodes
