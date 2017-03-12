@@ -1,5 +1,5 @@
 // meshtree.js
-var meshTree = localStorage.getItem('MeSHTree'); // {name: 'MeSH', address: 'root', children: [16]}
+var meshTree;// = localStorage.getItem('MeSHTree'); // {name: 'MeSH', address: 'root', children: [16]}
 var descNodes; // key: name.replace(/ /g, '').toLowerCase(), value: list of addresses
 var trees = {}; // Key: A, B, C, ..., Z Value: treeRoot
 var lastSearch;
@@ -15,6 +15,47 @@ var svgInit = d3.select("body").append("svg")
 .attr("width", width + margin.right + margin.left)
 .attr("height", height + margin.top + margin.bottom)
 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+//Container for the gradients
+var defs = svgInit.append("defs");
+
+//Filter for the outside glow
+var filter = defs.append("filter")
+	.attr("x", "-100%")
+	.attr("y", "-100%")
+	.attr("width", "300%")
+	.attr("height", "300%")
+	.attr("id","glow");
+
+filter.append("feFlood")
+	.attr("flood-color","#870052")
+	.attr("flood-opacity","1")
+	.attr("result","flood");
+
+filter.append("feComposite")
+	.attr("in","flood")
+	.attr("in2","SourceGraphic")
+	.attr("operator","in")
+	.attr("result","mask");
+
+filter.append("feMorphology")
+	.attr("in","mask")
+	.attr("radius","2")
+	.attr("operator","dilate")
+	.attr("result","dilated");
+
+filter.append("feGaussianBlur")
+	.attr("in","dilated")
+	.attr("stdDeviation","3")
+	.attr("result","blurred");
+
+var feMerge = filter.append("feMerge");
+
+feMerge.append("feMergeNode")
+	.attr("in","blurred");
+
+feMerge.append("feMergeNode")
+	.attr("in","SourceGraphic");
 
 /*var svgHeart = svgInit.append('g').attr('class', 'heart')
         .attr('transform', 'translate(150, 150) rotate(45)');
@@ -368,8 +409,9 @@ function treeRoot(treeData, gNodes, w, h, offsetw, offseth, treeRotate, mTagRota
     .attr('cursor', 'pointer')
     .transition()
     .delay(this.delay)
-    .duration(this.duration)
-    .attr('r', d => d.data.name == lastSearch ? 7.5 : 3);
+      .duration(this.duration)
+      .attr('r', d => d.data.name == lastSearch ? 7.5 : 3)
+      .style('filter', d => d.data.name == lastSearch ? 'url(#glow)' : 'none');
 
     // Remove any exiting nodes
     var nodeExit = node.exit().transition()
