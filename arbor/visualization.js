@@ -1,4 +1,4 @@
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
+var margin = {top: 200, right: 120, bottom: 20, left: 120},
     width = $("#visualization").width() - margin.right - margin.left,
     height = $("#visualization").height() - margin.top - margin.bottom;
 
@@ -62,24 +62,24 @@ filter.append("feMorphology")
 	.attr("radius","2")
 	.attr("operator","dilate")
 	.attr("result","dilated");
-	
+
 filter.append("feGaussianBlur")
 	.attr("in","dilated")
 	.attr("stdDeviation","2")
 	.attr("result","blurred");
-	
+
 var feMerge = filter.append("feMerge");
 
 feMerge.append("feMergeNode")
 	.attr("in","blurred");
-	
+
 feMerge.append("feMergeNode")
 	.attr("in","SourceGraphic");
 
 
 
-	
-	
+
+
 d3.json("data.json", function(error, data) {
   if (error) throw error;
 
@@ -94,12 +94,12 @@ d3.json("data.json", function(error, data) {
       d.children = null;
     }
   }
-  
+
   d3.csv("data.csv", function(error, data) {
 		if (error) throw error;
 
 		csvdata = data;
-		
+
 		search();
 	});
 
@@ -112,22 +112,22 @@ d3.json("data.json", function(error, data) {
 
 
 var colors = {
-	"Anatomy": "#795548",
-	"Organisms": "#FF8F00",
-	"Diseases": "#FFC107",
-	"Chemicals and Drugs": "#FFD54F",
-	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#6A1B9A",
-	"Psychiatry and Psychology": "#9C27B0",
-	"Phenomena and Processes": "#BA68C8",
-	"Disciplines and Occupations": "#00838F",
-	"Anthropology, Education, Sociology, and Social Phenomena": "#00BCD4",
-	"Technology, Industry, and Agriculture": "#4DD0E1",
-	"Humanities": "#2E7D32",
-	"Information Science": "#4CAF50",
-	"Named Groups": "#81C784",
-	"Health Care": "#1565C0",
-	"Publication Characteristics": "#2196F3",
-	"Geographicals": "#64B5F6"	
+	"Anatomy": "#C189C4",
+	"Organisms": "#C8457F",
+	"Diseases": "#795548",
+	"Chemicals and Drugs": "#FFA500",
+	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#A63603",
+	"Psychiatry and Psychology": "#E6550D",
+	"Phenomena and Processes": "#FD8D3C",
+	"Disciplines and Occupations": "#FDBE85",
+	"Anthropology, Education, Sociology, and Social Phenomena": "#006D2C",
+	"Technology, Industry, and Agriculture": "#31A354",
+	"Humanities": "#74C476",
+	"Information Science": "#BAE4B3",
+	"Named Groups": "#08519C",
+	"Health Care": "#3182BD",
+	"Publication Characteristics": "#6BAED6",
+	"Geographicals": "#BDD7E7"
 }
 
 
@@ -143,7 +143,7 @@ function update(source) {
       links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 320; });
+  nodes.forEach(function(d) { d.y = d.depth * 550; });
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -154,9 +154,9 @@ function update(source) {
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
       .on("click", click);
-	
-	
-	
+
+
+
 	//Use circles for all but first level.
   nodeEnter.filter(function(d) {
 	  if(d.depth === 1) return false;
@@ -169,9 +169,9 @@ function update(source) {
       .style("fill", d => d._children ? colorMe(source.address) : "#FFF")
       .style("stroke", d => colorMe(source.address))
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
-	
-	
-	
+
+
+
 	//Use rectangles for first level.
 	nodeEnter.filter(function(d) {
 		if(d.depth === 1) return true;
@@ -186,7 +186,7 @@ function update(source) {
 		//.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
 
-		
+
 
   nodeEnter.append("text")
       //.attr("x", function(d) { return d.children || d._children ? -10 : 10; })
@@ -255,7 +255,7 @@ function update(source) {
     d.x0 = d.x;
     d.y0 = d.y;
   });
-  
+
   d3.selectAll(".node")
 		.filter(function(a){
 			if(a.name === "Geographicals") return true;
@@ -289,26 +289,26 @@ function click(d) {
  * Expands all paths to the searched nodes.
  */
 function expand(root, paths) {
-	
+
 	var current = root;
-	
+
 	//Each path.
 	for(var i = 0; i < paths.length; i++) {
 		var path = paths[i].split(".");
 		var treeletter = path[0].slice(0,1);
-		
+
 		//Get the correct tree.
 		var tree;
 		for(var j = 0; j < root.children.length; j++) {
 			if(root.children[j].address === treeletter) tree = root.children[j];
 		}
-		
+
 		//The current node is the first node in a tree.
 		current = tree;
-		
+
 		console.log("Tree: " + treeletter);
 		console.log("Path: " + path);
-		
+
 		//The path to each node in the path.
 		//If the path is A.B.C then the nodes have paths
 		//A, A.B and A.B.C.
@@ -316,22 +316,22 @@ function expand(root, paths) {
 		for(var j = 0; j < path.length; j++) {
 			nodesPaths.push(path.slice(0, j+1).join("."));
 		}
-		
+
 		console.log("Paths: ");
 		console.log(nodesPaths);
-		
+
 		//Follow the path. At each node simulate a click.
 		for(var j = 0; j < nodesPaths.length; j++) {
 			console.log("Current node: " + current.name);
-			
+
 			//The path to the next node.
 			var pathToNextNode = nodesPaths[j];
-			
+
 			//console.log("Path to next node: " + nodesPaths[j]);
-			
+
 			if(current._children != null) {
 				//Hidden children. Look for a child with the correct path.
-				
+
 				for(var n = 0; n < current._children.length; n++) {
 					if(current._children[n].address === nodesPaths[j]) {
 						console.log("Next node: " + current._children[n].name);
@@ -344,10 +344,10 @@ function expand(root, paths) {
 						break;
 					}
 				}
-				
+
 			} else if(current.children != null) {
 				//Non hidden children. Look for a child with the correct path but don't click.
-				
+
 				for(var n = 0; n < current.children.length; n++) {
 					if(current.children[n].address === nodesPaths[j]) {
 						console.log("Next node (b): " + current.children[n].name);
@@ -357,7 +357,7 @@ function expand(root, paths) {
 					}
 				}
 			}
-		
+
 		}
 	}
 }
@@ -382,28 +382,28 @@ function searchcsv(searchText) {
 
 
 function search() {
-	
+
 	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	searchText = window.location.href.split("?searchtext=")[1];
+	searchText = window.location.href.split("?searchtext=")[1].replace(/\+/g, ' ');
 	console.log(searchText);
 	addresses = [];
-	
+
 	//Get the paths to the nodes.
 	var paths = searchcsv(searchText);
-	
+
 	console.log("Paths: ");
 	console.log(paths);
-	
+
 	//searchTree(root, searchText);
 	//console.log(addresses);
-	
+
 	//Expand the tree to the nodes.
 	expand(root, paths);
-	
-	
-	
-	
-	
+
+
+
+
+
 	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
@@ -435,5 +435,5 @@ function colorMe(path) {
 	if(treeName === "M") return colors["Named Groups"];
 	if(treeName === "N") return colors["Health Care"];
 	if(treeName === "V") return colors["Publication Characteristics"];
-	if(treeName === "Z") return colors["Geographicals"];	
+	if(treeName === "Z") return colors["Geographicals"];
 }
