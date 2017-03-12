@@ -164,7 +164,10 @@ function update(source) {
 	})
 	.append("circle")
       .attr("r", 1e-6)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+      //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
+      //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"})
+      .style("fill", d => d._children ? colorMe(source.address) : "#FFF")
+      .style("stroke", d => colorMe(source.address))
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
 	
 	
@@ -187,12 +190,12 @@ function update(source) {
 
   nodeEnter.append("text")
       //.attr("x", function(d) { return d.children || d._children ? -10 : 10; })
-	  .attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
+	  	.attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
-	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
+	  	.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
 
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
@@ -201,7 +204,8 @@ function update(source) {
 
   nodeUpdate.select("circle")
       .attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+      //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+      //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"});
 
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
@@ -225,8 +229,8 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
-	  .style("stroke", function(d) {return colorMe(source.address)})
-	  .attr("opacity", function(d) {if(d.source.depth === 0) return 0; else return 1;}) //Hides first level.
+	  	.style("stroke", function(d) {return colorMe(source.address)})
+	  	.attr("opacity", function(d) {if(d.source.depth === 0) return 0; else return 1;}) //Hides first level.
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
@@ -410,7 +414,6 @@ function search() {
 		.attr("r", 18)
 		.style("filter", function(d) {return "url(#glow)"});
 }
-
 
 
 

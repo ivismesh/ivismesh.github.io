@@ -3,10 +3,6 @@ html, body, .container-fluid, .row, #visualization {
     height: 100%;
 }
 
-#visualization {
-	padding: 10px;
-}
-
 body {
 	font: 400 15px Lato;
 	color: #303030;
@@ -25,6 +21,11 @@ h4 {
     padding: 60px 50px 50px 50px;
  }
 
+.mesh-padding {
+	padding-top: 60px;
+}
+
+/* NAVIGATION */
 .navbar {
 	background-color: #870052;
 	border: none;
@@ -55,11 +56,6 @@ h4 {
 	background-color: #870052 !important;
 }
 
-footer {
-	background-color: #222;
-	color: #FFF;
-}
-
 form {
 	width: 50%;
 	padding: 8px 12px;
@@ -86,10 +82,37 @@ form {
 	border: none;
 }
 
-.mesh-padding {
-	padding-top: 60px;
+/* VISUALIZATION */
+#visualization {
+	padding: 10px;
 }
 
+.node text {
+  font: 15px Lato;
+  paint-order: stroke;
+  stroke: #FFF;
+  stroke-width: 5px;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: grey;
+  stroke-width: 1.5px;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+/* RIGHT PANEL */
 .text-box {
   background-color: #b0ca3b;
   padding: 1em 1.3em;
