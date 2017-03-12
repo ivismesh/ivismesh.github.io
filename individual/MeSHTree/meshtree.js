@@ -84,11 +84,11 @@ if(meshTree) {
   });
 }
 else {
-  $.get('./data/MeSHTree.json', function(data) {
+  $.getJSON('./data/MeSHTree.json', function(data) {
     // TODO ? load indicator that exits in dataReady()
-    localStorage.setItem('MeSHTree', data);
+    //localStorage.setItem('MeSHTree', data);
     console.log("MeSHTree from server");
-    meshTree = JSON.parse(data);
+    meshTree = data;
     $.getJSON('./data/descNodes.json', function(data2) {
       descNodes = data2;
       dataReady();
