@@ -112,22 +112,22 @@ d3.json("data.json", function(error, data) {
 
 
 var colors = {
-	"Anatomy": "#AA3939",
-	"Organisms": "#FFAAAA",
-	"Diseases": "#D46A6A",
-	"Chemicals and Drugs": "#801515",
-	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#550000",
-	"Psychiatry and Psychology": "#226666",
-	"Phenomena and Processes": "#669999",
-	"Disciplines and Occupations": "#407F7F",
-	"Anthropology, Education, Sociology, and Social Phenomena": "#0D4D4D",
-	"Technology, Industry, and Agriculture": "#003333",
-	"Humanities": "#7B9F35",
-	"Information Science": "#D4EE9F",
-	"Named Groups": "#A5C663",
-	"Health Care": "#567714",
-	"Publication Characteristics": "#354F00",
-	"Geographicals": "#954505"	
+	"Anatomy": "#795548",
+	"Organisms": "#FF8F00",
+	"Diseases": "#FFC107",
+	"Chemicals and Drugs": "#FFD54F",
+	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#6A1B9A",
+	"Psychiatry and Psychology": "#9C27B0",
+	"Phenomena and Processes": "#BA68C8",
+	"Disciplines and Occupations": "#00838F",
+	"Anthropology, Education, Sociology, and Social Phenomena": "#00BCD4",
+	"Technology, Industry, and Agriculture": "#4DD0E1",
+	"Humanities": "#2E7D32",
+	"Information Science": "#4CAF50",
+	"Named Groups": "#81C784",
+	"Health Care": "#1565C0",
+	"Publication Characteristics": "#2196F3",
+	"Geographicals": "#64B5F6"	
 }
 
 
@@ -225,6 +225,7 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
+	  .style("stroke", function(d) {return colorMe(source.address)})
 	  .attr("opacity", function(d) {if(d.source.depth === 0) return 0; else return 1;}) //Hides first level.
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
@@ -335,7 +336,7 @@ function expand(root, paths) {
 						//Change current node to the correct child.
 						current = current._children[n];
 						//Click the previously current node.
-						click(nodeToClick);
+						click(nodeToClick, current.name);
 						break;
 					}
 				}
@@ -379,7 +380,7 @@ function searchcsv(searchText) {
 function search() {
 	
 	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	searchText = window.location.href.split("?searchtext=")[1].replace(/\+/g, ' ');
+	searchText = window.location.href.split("?searchtext=")[1];
 	console.log(searchText);
 	addresses = [];
 	
@@ -408,4 +409,28 @@ function search() {
 		.selectAll("circle")
 		.attr("r", 18)
 		.style("filter", function(d) {return "url(#glow)"});
+}
+
+
+
+
+
+function colorMe(path) {
+	var treeName = path.split(".")[0].split("")[0]
+	if(treeName === "A") return colors["Anatomy"];
+	if(treeName === "B") return colors["Organisms"];
+	if(treeName === "C") return colors["Diseases"];
+	if(treeName === "D") return colors["Chemicals and Drugs"];
+	if(treeName === "E") return colors["Analytical, Diagnostic and Therapeutic Techniques, and Equipment"];
+	if(treeName === "F") return colors["Psychiatry and Psychology"];
+	if(treeName === "G") return colors["Phenomena and Processes"];
+	if(treeName === "H") return colors["Disciplines and Occupations"];
+	if(treeName === "I") return colors["Anthropology, Education, Sociology, and Social Phenomena"];
+	if(treeName === "J") return colors["Technology, Industry, and Agriculture"];
+	if(treeName === "K") return colors["Humanities"];
+	if(treeName === "L") return colors["Information Science"];
+	if(treeName === "M") return colors["Named Groups"];
+	if(treeName === "N") return colors["Health Care"];
+	if(treeName === "V") return colors["Publication Characteristics"];
+	if(treeName === "Z") return colors["Geographicals"];	
 }
