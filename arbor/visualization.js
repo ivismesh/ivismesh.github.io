@@ -47,7 +47,7 @@ var filter = defs.append("filter")
 	.attr("id","glow");
 
 filter.append("feFlood")
-	.attr("flood-color","green")
+	.attr("flood-color", "#FF0000")
 	.attr("flood-opacity","1")
 	.attr("result","flood");
 
@@ -65,7 +65,7 @@ filter.append("feMorphology")
 	
 filter.append("feGaussianBlur")
 	.attr("in","dilated")
-	.attr("stdDeviation","3")
+	.attr("stdDeviation","2")
 	.attr("result","blurred");
 	
 var feMerge = filter.append("feMerge");
