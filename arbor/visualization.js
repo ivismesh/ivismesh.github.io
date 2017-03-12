@@ -1,4 +1,4 @@
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
+var margin = {top: 200, right: 120, bottom: 20, left: 120},
     width = $("#visualization").width() - margin.right - margin.left,
     height = $("#visualization").height() - margin.top - margin.bottom;
 
