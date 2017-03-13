@@ -5,7 +5,7 @@ var margin = {top: 20, right: 120, bottom: 20, left: 120},
 var i = 0,
   duration = 750,
   root,
-	csvdata,
+	descToPaths,
 	searchText;
 
 var tree = d3.layout.tree()
@@ -87,24 +87,28 @@ d3.json("data.json", function(error, data) {
   root.x0 = height / 2;
   root.y0 = 0;
 
-  function collapse(d) {
-    if (d.children) {
-      d._children = d.children;
-      d._children.forEach(collapse);
-      d.children = null;
-    }
-  }
-
-  d3.csv("data.csv", function(error, data) {
+  d3.json("descNodes.json", function(error, data) {
 		if (error) throw error;
+		descToPaths = data;
 
-		csvdata = data;
+    root.children.forEach(collapse);
+    update(root);
 
-		search();
+    // search form button onClick
+  	$("#searchButton").click(function(e) {
+  		e.preventDefault();
+  		search($("#searchText").val());
+  	});
+  	// search form onEnter
+  	$("#searchText").bind('keydown', e => enterKey(e));
+  	function enterKey(e) {
+  		if(e.keyCode == 13) {
+  			e.preventDefault();
+  			search($("#searchText").val());
+  		}
+  	}
 	});
 
-  root.children.forEach(collapse);
-  update(root);
 });
 
 
@@ -136,6 +140,80 @@ var colors = {
 
 d3.select(self.frameElement).style("height", "800px");
 
+function collapse(d) {
+  if (d.children) {
+    d._children = d.children;
+    d._children.forEach(collapse);
+    d.children = null;
+  }
+}
+
+function collapse(d) {
+  //console.log("collapsing: " + d.data.address);
+	if(d.children) {
+		if(!d._children) d._children = d.children;
+		else {
+			for(var child in d.children) {
+				d._children.push(d.children[child]);
+			}
+		}
+		if(d._children.length == 0) d._children = null;
+		d.children = null;
+		for(var child in d._children) {
+			this.collapse(d._children[child]);
+		}
+	}
+}
+
+
+
+
+/*
+ * Expands all paths to the searched nodes.
+ */
+ function expand(d, addr) {
+ 	/*console.log("growing: " + d.data.address + ' to ' + addr);
+ 	console.log(d);*/
+
+ 	// if this d has address == addr
+ 	if(d.address == addr) {
+ 		if(d._children) {
+ 			if(!d.children) d.children = d._children;
+ 			else {
+ 				for(var child in d._children) {
+ 					d.children.push(d._children[child]);
+ 				}
+ 			}
+ 		}
+ 		d._children = null;
+ 		return;
+ 	}
+
+ 	// else if thid d has address shorter than addr
+ 	else if(addr.length > d.address.length) {
+ 		let subPath = addr.slice(0, d.address.length);
+ 		if(d._children) {
+ 			if(!d.children) d.children = [];
+ 			for(var child in d._children) {
+ 				if(d._children[child].address == addr.slice(0, d._children[child].address.length)) {
+ 					d.children.push(d._children.splice(child, 1)[0]);
+ 					break;
+ 				}
+ 			}
+ 			if(d._children.length == 0) d._children = null;
+ 		}
+ 		if(d.children) {
+ 			for(var child in d.children) {
+ 				if(d.children[child].address == addr.slice(0, d.children[child].address.length)) {
+ 					expand(d.children[child], addr);
+ 				}
+ 			}
+ 		}
+ 	}
+}
+
+
+
 function update(source) {
 
   // Compute the new tree layout.
@@ -166,7 +244,7 @@ function update(source) {
       .attr("r", 1e-6)
       //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
       //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"})
-      .style("fill", d => d._children ? colorMe(source.address) : "#FFF")
+      .style("fill", d => d._children ? colorMe(d.address) : "#FFF")
       .style("stroke", d => colorMe(source.address))
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
 
@@ -229,8 +307,8 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
-	  	.style("stroke", function(d) {return colorMe(source.address)})
-	  	.attr("opacity", function(d) {if(d.source.depth === 0) return 0; else return 1;}) //Hides first level.
+	  	.style("stroke", function(d) {return colorMe(d.target.address)})
+	  	.attr("opacity", function(d) {console.log("DDDDDDD", d);if(d.source.depth === 0) return 0; else return 0.4;}) //Hides first level.
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
@@ -285,96 +363,9 @@ function click(d) {
 
 
 
-/*
- * Expands all paths to the searched nodes.
- */
-function expand(root, paths) {
-
-	var current = root;
-
-	//Each path.
-	for(var i = 0; i < paths.length; i++) {
-		var path = paths[i].split(".");
-		var treeletter = path[0].slice(0,1);
-
-		//Get the correct tree.
-		var tree;
-		for(var j = 0; j < root.children.length; j++) {
-			if(root.children[j].address === treeletter) tree = root.children[j];
-		}
-
-		//The current node is the first node in a tree.
-		current = tree;
-
-		console.log("Tree: " + treeletter);
-		console.log("Path: " + path);
-
-		//The path to each node in the path.
-		//If the path is A.B.C then the nodes have paths
-		//A, A.B and A.B.C.
-		var nodesPaths = [];
-		for(var j = 0; j < path.length; j++) {
-			nodesPaths.push(path.slice(0, j+1).join("."));
-		}
-
-		console.log("Paths: ");
-		console.log(nodesPaths);
-
-		//Follow the path. At each node simulate a click.
-		for(var j = 0; j < nodesPaths.length; j++) {
-			console.log("Current node: " + current.name);
-
-			//The path to the next node.
-			var pathToNextNode = nodesPaths[j];
-
-			//console.log("Path to next node: " + nodesPaths[j]);
-
-			if(current._children != null) {
-				//Hidden children. Look for a child with the correct path.
-
-				for(var n = 0; n < current._children.length; n++) {
-					if(current._children[n].address === nodesPaths[j]) {
-						console.log("Next node: " + current._children[n].name);
-						//Save the node to click.
-						var nodeToClick = current;
-						//Change current node to the correct child.
-						current = current._children[n];
-						//Click the previously current node.
-						click(nodeToClick, current.name);
-						break;
-					}
-				}
-
-			} else if(current.children != null) {
-				//Non hidden children. Look for a child with the correct path but don't click.
-
-				for(var n = 0; n < current.children.length; n++) {
-					if(current.children[n].address === nodesPaths[j]) {
-						console.log("Next node (b): " + current.children[n].name);
-						//Change current node to the correct child.
-						current = current.children[n];
-						break;
-					}
-				}
-			}
-
-		}
-	}
-}
-
-
-
-
-
 function searchcsv(searchText) {
 	console.log("Searching for paths to: " + searchText);
-	var paths = [];
-	csvdata.forEach(function(d) {
-		if(d.name === searchText) {
-			paths.push(d.address);
-		}
-	});
-	return paths;
+	return descToPaths[searchText.replace(/ /g, '').toLowerCase];
 }
 
 
@@ -383,13 +374,11 @@ function searchcsv(searchText) {
 
 function search() {
 
-	//var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	searchText = window.location.href.split("?searchtext=")[1];
+  var searchText = document.getElementById("searchForm").elements["searchText"].value;
+	//searchText = window.location.href.split("?searchtext=")[1];
 	console.log(searchText);
-	addresses = [];
-
 	//Get the paths to the nodes.
-	var paths = searchcsv(searchText);
+	var paths = descToPaths[searchText.replace(/ /g, '').toLowerCase()];
 
 	console.log("Paths: ");
 	console.log(paths);
@@ -398,13 +387,12 @@ function search() {
 	//console.log(addresses);
 
 	//Expand the tree to the nodes.
-	expand(root, paths);
-
-
-
-
-
-	//Apply filters.
+  root.children.forEach(collapse);
+  for(path in paths) {
+	   expand(root, paths[path]);
+  }
+  update(root);
+  //Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
 			if(a.name === searchText) return true;
@@ -419,7 +407,7 @@ function search() {
 
 
 function colorMe(path) {
-	var treeName = path.slice(0,1)
+	var treeName = path.split(".")[0].split("")[0]
 	if(treeName === "A") return colors["Anatomy"];
 	if(treeName === "B") return colors["Organisms"];
 	if(treeName === "C") return colors["Diseases"];
