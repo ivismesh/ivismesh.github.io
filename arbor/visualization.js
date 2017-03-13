@@ -65,7 +65,7 @@ filter.append("feMorphology")
 
 filter.append("feGaussianBlur")
 	.attr("in","dilated")
-	.attr("stdDeviation","0")
+	.attr("stdDeviation","3")
 	.attr("result","blurred");
 
 var feMerge = filter.append("feMerge");
@@ -93,7 +93,7 @@ d3.json("data.json", function(error, data) {
 
 		descToPaths = data;
 
-    let searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
+    searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
     root.children.forEach(collapse);
     if(searchText.length > 0) {
