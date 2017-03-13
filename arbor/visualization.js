@@ -93,25 +93,28 @@ d3.json("data.json", function(error, data) {
 
 		descToPaths = data;
 
-		search();
-	});
+    let searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
-  root.children.forEach(collapse);
-  update(root);
+    root.children.forEach(collapse);
+    if(searchText.length > 0) {
+      search(searchText);
+    }
+    update(root);
 
-  // search form button onClick
-	$("#searchButton").click(function(e) {
-		e.preventDefault();
-		search($("#searchText").val());
+    // search form button onClick
+  	$("#searchButton").click(function(e) {
+  		e.preventDefault();
+  		search($("#searchText").val());
+  	});
+  	// search form onEnter
+  	$("#searchText").bind('keydown', e => enterKey(e));
+  	function enterKey(e) {
+  		if(e.keyCode == 13) {
+  			e.preventDefault();
+  			search($("#searchText").val());
+  		}
+  	}
 	});
-	// search form onEnter
-	$("#searchText").bind('keydown', e => enterKey(e));
-	function enterKey(e) {
-		if(e.keyCode == 13) {
-			e.preventDefault();
-			search($("#searchText").val());
-		}
-	}
 
 });
 
@@ -235,8 +238,8 @@ function update(source) {
       .attr("r", 1e-6)
       //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
       //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"})
-      .style("fill", d => d._children ? colorMe(source.address) : "#FFF")
-      .style("stroke", d => colorMe(source.address))
+      .style("fill", d => d._children ? colorMe(d.address) : "#FFF")
+      .style("stroke", d => colorMe(d.address))
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
 
 
@@ -298,7 +301,7 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
-	  	.style("stroke", function(d) { return colors[colorMe(d.target.address)]})
+	  	.style("stroke", function(d) { return colorMe(d.target.address) } )
 	  	.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 0.6 } ) //Hides first level.
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
@@ -368,13 +371,12 @@ function searchcsv(searchText) {
 
 
 
-function search() {
+function search(string) {
 
-	var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	//searchText = window.location.href.split("?searchtext=")[1];
-	console.log(searchText);
 	//Get the paths to the nodes.
-	var paths = descToPaths[searchText.replace(/ /g, '').toLowerCase()];
+	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
+
+  if(paths.length > 0) history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
 
 	console.log("Paths: ");
 	console.log(paths);
@@ -390,7 +392,7 @@ function search() {
 	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === searchText) return true;
+			if(a.name === string) return true;
 			else return false;
 		})
 		.selectAll("circle")
@@ -405,7 +407,7 @@ function search() {
 
 
 function colorMe(path) {
-	var treeName = path.split(".")[0].split("")[0]
+	var treeName = path.slice(0,1);
 	if(treeName === "A") return colors["Anatomy"];
 	if(treeName === "B") return colors["Organisms"];
 	if(treeName === "C") return colors["Diseases"];
