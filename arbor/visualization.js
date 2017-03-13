@@ -93,7 +93,7 @@ d3.json("data.json", function(error, data) {
 
 		descToPaths = data;
 
-    let searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
+    searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
     root.children.forEach(collapse);
     if(searchText.length > 0) {
