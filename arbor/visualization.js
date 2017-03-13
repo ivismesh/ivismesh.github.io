@@ -28,11 +28,11 @@ var svg = d3.select("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-function zoomed(){
+function zoomed() {
 	var tx = Math.min(150, d3.event.translate[0]),
 		//ty = Math.min(0, d3.event.translate[1]);
 		ty = d3.event.translate[1];
-	svg.attr("transform", "translate(" + [tx, ty] + ")scale(" + d3.event.scale + ")");
+	svg.attr("transform", "translate(" + [tx, ty] + ") scale(" + d3.event.scale + ")");
 }
 
 //Container for the gradients
@@ -99,7 +99,7 @@ d3.json("data.json", function(error, data) {
     if(searchText.length > 0) {
       search(searchText);
     }
-    update(root);
+    else update(root);
 
     // search form button onClick
   	$("#searchButton").click(function(e) {
@@ -115,6 +115,8 @@ d3.json("data.json", function(error, data) {
   		}
   	}
 	});
+
+  $('#searchText').focus();
 
 });
 
@@ -215,7 +217,9 @@ function update(source) {
       links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 550; });
+  nodes.forEach(function(d) {
+    d.y = d.depth * 500;
+  });
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -236,8 +240,6 @@ function update(source) {
 	})
 	.append("circle")
       .attr("r", 1e-6)
-      //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
-      //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"})
       .style("fill", d => d._children ? colorMe(d.address) : "#FFF")
       .style("stroke", d => colorMe(d.address))
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
@@ -265,9 +267,20 @@ function update(source) {
 	  	.attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .text(function(d) { return d.name; })
+      .attr('class', d => d.name.length < 18 ? 'fulltext' : 'shorttext')
+      .text(function(d) {
+        return d.name.length < 40 ? d.name : d.name.slice(0, 39);
+      })
       .style("fill-opacity", 1e-6)
-	  	.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
+	  	.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;}) //Hide first level.
+      .on('mouseover', function(d) {
+        if(d.name.length > 40) {
+          d3.select(this).text(d => d.name);
+        }
+      })
+      .on('mouseout', function(d) {
+        d3.select(this).text(d => d.name.slice(0, 39));
+      });
 
   // Transition nodes to their new position.
   var nodeUpdate = node.transition()
@@ -328,13 +341,13 @@ function update(source) {
     d.y0 = d.y;
   });
 
-  d3.selectAll(".node")
+  /*d3.selectAll(".node")
 		.filter(function(a){
 			if(a.name === "Geographicals") return true;
 			else return false;
 		})
 		.attr("x", 0)
-		.attr("x0", 0);
+		.attr("x0", 0);*/
 }
 
 
@@ -343,12 +356,18 @@ function update(source) {
 
 // Toggle children on click.
 function click(d) {
-  if (d.children) {
+  if(d._children) {
+    if(!d.children) d.children = d._children;
+    else {
+      for(child in d._children) {
+        d.children.push(d._children[child]);
+      }
+    }
+    d.children.sort(function(a, b) { return a.address.slice(a.address.length-3,a.address.length) > b.address.slice(b.address.length-3,b.address.length) ? 1 : -1 });
+    d._children = null;
+  } else if(d.children) {
     d._children = d.children;
     d.children = null;
-  } else {
-    d.children = d._children;
-    d._children = null;
   }
   update(d);
 }
@@ -376,7 +395,8 @@ function search(string) {
 	//Get the paths to the nodes.
 	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
 
-  if(paths) history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
+  if(paths != undefined) history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
+  else history.replaceState(null, "search", '?searchtext=');
 
 	console.log("Paths: ");
 	console.log(paths);
@@ -389,7 +409,9 @@ function search(string) {
   for(path in paths) {
 	   expand(root, paths[path]);
   }
-	//Apply filters.
+  update(root);
+
+  //Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
 			if(a.name === string) return true;
@@ -398,9 +420,6 @@ function search(string) {
 		.selectAll("circle")
 		.attr("r", 18)
 		.style("filter", function(d) {return "url(#glow)"});
-
-
-    update(root);
 }
 
 
