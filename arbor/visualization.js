@@ -92,6 +92,13 @@ d3.json("data.json", function(error, data) {
 		descToPaths = data;
 
     root.children.forEach(collapse);
+
+  	let searchText = window.location.href.split("?searchtext=")[1];
+    if(searchText.length > 0) {
+      searchText = searchText.replace(/\+/, ' ');
+      search(searchText);
+    }
+
     update(root);
 
     // search form button onClick
@@ -139,14 +146,6 @@ var colors = {
 
 
 d3.select(self.frameElement).style("height", "800px");
-
-function collapse(d) {
-  if (d.children) {
-    d._children = d.children;
-    d._children.forEach(collapse);
-    d.children = null;
-  }
-}
 
 function collapse(d) {
   //console.log("collapsing: " + d.data.address);
@@ -372,13 +371,10 @@ function searchcsv(searchText) {
 
 
 
-function search() {
+function search(string) {
 
-  var searchText = document.getElementById("searchForm").elements["searchText"].value;
-	//searchText = window.location.href.split("?searchtext=")[1];
-	console.log(searchText);
 	//Get the paths to the nodes.
-	var paths = descToPaths[searchText.replace(/ /g, '').toLowerCase()];
+	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
 
 	console.log("Paths: ");
 	console.log(paths);
@@ -395,7 +391,7 @@ function search() {
   //Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === searchText) return true;
+			if(a.name === string) return true;
 			else return false;
 		})
 		.selectAll("circle")
