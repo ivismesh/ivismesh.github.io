@@ -376,7 +376,7 @@ function search(string) {
 	//Get the paths to the nodes.
 	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
 
-  if(paths.length > 0) history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
+  if(paths) history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
 
 	console.log("Paths: ");
 	console.log(paths);
