@@ -1,4 +1,4 @@
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
+var margin = {top: 200, right: 120, bottom: 20, left: 120},
     width = $("#visualization").width() - margin.right - margin.left,
     height = $("#visualization").height() - margin.top - margin.bottom;
 
@@ -47,7 +47,7 @@ var filter = defs.append("filter")
 	.attr("id","glow");
 
 filter.append("feFlood")
-	.attr("flood-color","green")
+	.attr("flood-color", "#FF0000")
 	.attr("flood-opacity","1")
 	.attr("result","flood");
 
@@ -65,7 +65,7 @@ filter.append("feMorphology")
 
 filter.append("feGaussianBlur")
 	.attr("in","dilated")
-	.attr("stdDeviation","3")
+	.attr("stdDeviation","0")
 	.attr("result","blurred");
 
 var feMerge = filter.append("feMerge");
@@ -79,7 +79,6 @@ feMerge.append("feMergeNode")
 
 
 
-
 d3.json("data.json", function(error, data) {
   if (error) throw error;
 
@@ -87,34 +86,32 @@ d3.json("data.json", function(error, data) {
   root.x0 = height / 2;
   root.y0 = 0;
 
+  console.log(root);
+
   d3.json("descNodes.json", function(error, data) {
 		if (error) throw error;
+
 		descToPaths = data;
 
-    root.children.forEach(collapse);
-
-  	let searchText = window.location.href.split("?searchtext=")[1];
-    if(searchText.length > 0) {
-      searchText = searchText.replace(/\+/, ' ');
-      search(searchText);
-    }
-
-    update(root);
-
-    // search form button onClick
-  	$("#searchButton").click(function(e) {
-  		e.preventDefault();
-  		search($("#searchText").val());
-  	});
-  	// search form onEnter
-  	$("#searchText").bind('keydown', e => enterKey(e));
-  	function enterKey(e) {
-  		if(e.keyCode == 13) {
-  			e.preventDefault();
-  			search($("#searchText").val());
-  		}
-  	}
+		search();
 	});
+
+  root.children.forEach(collapse);
+  update(root);
+
+  // search form button onClick
+	$("#searchButton").click(function(e) {
+		e.preventDefault();
+		search($("#searchText").val());
+	});
+	// search form onEnter
+	$("#searchText").bind('keydown', e => enterKey(e));
+	function enterKey(e) {
+		if(e.keyCode == 13) {
+			e.preventDefault();
+			search($("#searchText").val());
+		}
+	}
 
 });
 
@@ -144,8 +141,8 @@ var colors = {
 
 
 
-
 d3.select(self.frameElement).style("height", "800px");
+
 
 function collapse(d) {
   //console.log("collapsing: " + d.data.address);
@@ -163,9 +160,6 @@ function collapse(d) {
 		}
 	}
 }
-
-
-
 
 /*
  * Expands all paths to the searched nodes.
@@ -211,8 +205,6 @@ function collapse(d) {
  	}
 }
 
-
-
 function update(source) {
 
   // Compute the new tree layout.
@@ -220,7 +212,7 @@ function update(source) {
       links = tree.links(nodes);
 
   // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 320; });
+  nodes.forEach(function(d) { d.y = d.depth * 550; });
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -243,7 +235,7 @@ function update(source) {
       .attr("r", 1e-6)
       //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
       //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"})
-      .style("fill", d => d._children ? colorMe(d.address) : "#FFF")
+      .style("fill", d => d._children ? colorMe(source.address) : "#FFF")
       .style("stroke", d => colorMe(source.address))
 	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
 
@@ -306,8 +298,8 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
       .attr("class", "link")
-	  	.style("stroke", function(d) { return colorMe(d.target.address) })
-	  	.attr("opacity", function(d) { if(d.source.depth === 0) return 0; else return 0.4; }) //Hides first level.
+	  	.style("stroke", function(d) { return colors[colorMe(d.target.address)]})
+	  	.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 0.6 } ) //Hides first level.
       .attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
@@ -361,20 +353,28 @@ function click(d) {
 
 
 
-
 function searchcsv(searchText) {
 	console.log("Searching for paths to: " + searchText);
-	return descToPaths[searchText.replace(/ /g, '').toLowerCase];
+	var paths = [];
+	csvdata.forEach(function(d) {
+		if(d.name === searchText) {
+			paths.push(d.address);
+		}
+	});
+	return paths;
 }
 
 
 
 
 
-function search(string) {
+function search() {
 
+	var searchText = document.getElementById("searchForm").elements["searchText"].value;
+	//searchText = window.location.href.split("?searchtext=")[1];
+	console.log(searchText);
 	//Get the paths to the nodes.
-	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
+	var paths = descToPaths[searchText.replace(/ /g, '').toLowerCase()];
 
 	console.log("Paths: ");
 	console.log(paths);
@@ -387,16 +387,18 @@ function search(string) {
   for(path in paths) {
 	   expand(root, paths[path]);
   }
-  update(root);
-  //Apply filters.
+	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === string) return true;
+			if(a.name === searchText) return true;
 			else return false;
 		})
 		.selectAll("circle")
 		.attr("r", 18)
 		.style("filter", function(d) {return "url(#glow)"});
+
+
+    update(root);
 }
 
 
