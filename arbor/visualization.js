@@ -408,7 +408,7 @@ function search(string) {
 			}
 		})
 		.selectAll("circle")
-		.attr("r", 18)
+		.attr("r", 48)
 		.style("filter", function(d) {return "url(#glow)"});
 }
 
