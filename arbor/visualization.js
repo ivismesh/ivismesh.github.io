@@ -407,7 +407,7 @@ function search(string) {
 	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === string) {
+			if(a.name === searchString) {
 				return true;
 			} else {
 				return false;
