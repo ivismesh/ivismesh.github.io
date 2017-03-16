@@ -255,7 +255,13 @@ function update(source) {
 		else return true;
 	})
 	.append("circle")
-		.attr("r", 19)
+		.attr("r", function(d) {
+			if(d.name === searchText) {
+				return 19;
+			} else {
+				return 1e-6;
+			}
+		})
 		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
@@ -299,7 +305,7 @@ function update(source) {
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
 	nodeUpdate.select("circle")
-		.attr("r", function(d) {if(d.name === searchText) return 19; else return 19})
+		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
 
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1);
@@ -311,7 +317,7 @@ function update(source) {
 		.remove();
 
 	nodeExit.select("circle")
-		.attr("r", 19);
+		.attr("r", 1e-6);
 
 	nodeExit.select("text")
 		.style("fill-opacity", 1e-6);
