@@ -377,20 +377,6 @@ function click(d) {
 
 
 
-function searchcsv(searchText) {
-	console.log("Searching for paths to: " + searchText);
-	var paths = [];
-	csvdata.forEach(function(d) {
-		if(d.name === searchText) {
-			paths.push(d.address);
-		}
-	});
-	return paths;
-}
-
-
-
-
 
 function search(string) {
 
