@@ -3,24 +3,27 @@ var margin = {top: 200, right: 120, bottom: 20, left: 120},
     height = $("#visualization").height() - margin.top - margin.bottom;
 
 var i = 0,
-  duration = 750,
-  root,
+	duration = 750,
+	root,
 	descToPaths,
 	searchText;
 
+// Tree with variable size.
 var tree = d3.layout.tree()
 	.nodeSize([25, 25]);
-    //.size([height, width]);
 
+// Cureved lines.
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
+// Zoom control.
 var zoom = d3.behavior.zoom()
     .translate([0, 0])
     .scale(1)
     .scaleExtent([0.5, 8])
     .on("zoom", zoomed);
 
+// Main canvas.
 var svg = d3.select("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
@@ -30,15 +33,14 @@ var svg = d3.select("svg")
 
 function zoomed() {
 	var tx = Math.min(150, d3.event.translate[0]),
-		//ty = Math.min(0, d3.event.translate[1]);
 		ty = d3.event.translate[1];
 	svg.attr("transform", "translate(" + [tx, ty] + ") scale(" + d3.event.scale + ")");
 }
 
-//Container for the gradients
+// Container for the gradients.
 var defs = svg.append("defs");
 
-//Filter for the outside glow
+// Filter for the outside glow.
 var filter = defs.append("filter")
 	.attr("x", "-100%")
 	.attr("y", "-100%")
@@ -79,51 +81,8 @@ feMerge.append("feMergeNode")
 
 
 
-d3.json("data.json", function(error, data) {
-  if (error) throw error;
 
-  root = data;
-  root.x0 = height / 2;
-  root.y0 = 0;
-
-  console.log(root);
-
-  d3.json("descNodes.json", function(error, data) {
-		if (error) throw error;
-
-		descToPaths = data;
-
-    searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
-
-    root.children.forEach(collapse);
-    if(searchText.length > 0) {
-      search(searchText);
-    }
-    else update(root);
-
-    // search form button onClick
-  	$("#searchButton").click(function(e) {
-  		e.preventDefault();
-  		search($("#searchText").val());
-  	});
-  	// search form onEnter
-  	$("#searchText").bind('keydown', e => enterKey(e));
-  	function enterKey(e) {
-  		if(e.keyCode == 13) {
-  			e.preventDefault();
-  			search($("#searchText").val());
-  		}
-  	}
-	});
-
-  $('#searchText').focus();
-
-});
-
-
-
-
-
+// Tree and node colors.
 var colors = {
 	"Anatomy": "#C189C4",
 	"Organisms": "#C8457F",
@@ -146,7 +105,58 @@ var colors = {
 
 
 
+
+d3.json("data.json", function(error, data) {
+	if (error) throw error;
+
+	root = data;
+	root.x0 = height / 2;
+	root.y0 = 0;
+
+	console.log(root);
+
+	d3.json("descNodes.json", function(error, data) {
+		if (error) throw error;
+
+		descToPaths = data;
+
+		searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
+
+		root.children.forEach(collapse);
+		if(searchText.length > 0) {
+			search(searchText);
+		}
+		else {
+			update(root);
+		}
+	
+		// Search form button on-click function.
+		$("#searchButton").click(function(e) {
+			e.preventDefault();
+			search($("#searchText").val());
+		});
+		// Search form on-enter function.
+		$("#searchText").bind('keydown', e => enterKey(e));
+		function enterKey(e) {
+			if(e.keyCode == 13) {
+				e.preventDefault();
+				search($("#searchText").val());
+			}
+		}
+	});
+
+	$('#searchText').focus();
+	
+});
+
+
+
+
+
 d3.select(self.frameElement).style("height", "800px");
+
+
+
 
 
 function collapse(d) {
@@ -165,6 +175,10 @@ function collapse(d) {
 		}
 	}
 }
+
+
+
+
 
 /*
  * Expands all paths to the searched nodes.
@@ -209,6 +223,10 @@ function collapse(d) {
  		}
  	}
 }
+
+
+
+
 
 function update(source) {
 
