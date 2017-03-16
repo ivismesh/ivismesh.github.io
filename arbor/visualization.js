@@ -121,6 +121,7 @@ d3.json("data.json", function(error, data) {
 		descToPaths = data;
 
 		searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
+		console.log("search: ");
 		console.log(searchText);
 		root.children.forEach(collapse);
 		if(searchText.length > 0) {
