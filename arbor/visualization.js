@@ -256,8 +256,8 @@ function update(source) {
 	})
 	.append("circle")
 		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5;})
-		.style("fill", "green")
-		.style("stroke", "green")
+		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
+		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
 	
 	//Use rectangles for first level.
@@ -408,7 +408,7 @@ function search(string) {
 			}
 		})
 		.selectAll("circle")
-		.attr("r", 18)
+		.attr("r", 9)
 		.style("filter", function(d) {return "url(#glow)"});
 }
 
