@@ -230,40 +230,36 @@ function collapse(d) {
 
 function update(source) {
 
-  // Compute the new tree layout.
-  var nodes = tree.nodes(root).reverse(),
-      links = tree.links(nodes);
+	// Compute the new tree layout.
+	var nodes = tree.nodes(root).reverse(),
+		links = tree.links(nodes);
 
-  // Normalize for fixed-depth.
-  nodes.forEach(function(d) {
-    d.y = d.depth * 500;
-  });
+	// Normalize for fixed-depth.
+	nodes.forEach(function(d) {
+		d.y = d.depth * 500;
+	});
 
-  // Update the nodes…
-  var node = svg.selectAll("g.node")
-      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+	// Update the nodes.
+	var node = svg.selectAll("g.node")
+		.data(nodes, function(d) { return d.id || (d.id = ++i); });
 
-  // Enter any new nodes at the parent's previous position.
-  var nodeEnter = node.enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-      .on("click", click);
-
-
-
-	//Use circles for all but first level.
-  nodeEnter.filter(function(d) {
-	  if(d.depth === 1) return false;
-	  else return true;
+	// Enter any new nodes at the parent's previous position.
+	var nodeEnter = node.enter().append("g")
+		.attr("class", "node")
+		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+		.on("click", click);
+	
+	// Use circles for all but first level.
+	nodeEnter.filter(function(d) {
+		if(d.depth === 1) return false;
+		else return true;
 	})
 	.append("circle")
-      .attr("r", 1e-6)
-      .style("fill", d => d._children ? colorMe(d.address) : "#FFF")
-      .style("stroke", d => colorMe(d.address))
-	  .attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
-
-
-
+		.attr("r", 1e-6)
+		.style("fill", d => d._children ? colorMe(d.address) : "#FFF")
+		.style("stroke", d => colorMe(d.address))
+		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
+	
 	//Use rectangles for first level.
 	nodeEnter.filter(function(d) {
 		if(d.depth === 1) return true;
@@ -275,97 +271,85 @@ function update(source) {
 		.attr("x", -10)
 		.attr("y", -14)
 		.attr("fill", function(d) {return colors[d.name]})
-		//.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; })
-		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		//Hide first level.
+		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
+	
+	// Add labels.
+	nodeEnter.append("text")
+		.attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
+		.attr("dy", ".35em")
+		.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+		.attr('class', d => d.name.length < 18 ? 'fulltext' : 'shorttext')
+		.text(function(d) {
+			return d.name.length < 40 ? d.name : d.name.slice(0, 39);
+		})
+		.style("fill-opacity", 1e-6)
+		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;}) // Hide first level.
+		.on('mouseover', function(d) {
+			if(d.name.length > 40) {
+				d3.select(this).text(d => d.name);
+			}
+		})
+		.on('mouseout', function(d) {
+			d3.select(this).text(d => d.name.slice(0, 39));
+		});
 
+	// Transition nodes to their new position.
+	var nodeUpdate = node.transition()
+		.duration(duration)
+		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
+	nodeUpdate.select("circle")
+		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
 
-  nodeEnter.append("text")
-      //.attr("x", function(d) { return d.children || d._children ? -10 : 10; })
-	  	.attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
-      .attr("dy", ".35em")
-      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .attr('class', d => d.name.length < 18 ? 'fulltext' : 'shorttext')
-      .text(function(d) {
-        return d.name.length < 40 ? d.name : d.name.slice(0, 39);
-      })
-      .style("fill-opacity", 1e-6)
-	  	.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;}) //Hide first level.
-      .on('mouseover', function(d) {
-        if(d.name.length > 40) {
-          d3.select(this).text(d => d.name);
-        }
-      })
-      .on('mouseout', function(d) {
-        d3.select(this).text(d => d.name.slice(0, 39));
-      });
+	nodeUpdate.select("text")
+		.style("fill-opacity", 1);
 
-  // Transition nodes to their new position.
-  var nodeUpdate = node.transition()
-      .duration(duration)
-      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+	// Transition exiting nodes to the parent's new position.
+	var nodeExit = node.exit().transition()
+		.duration(duration)
+		.attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+		.remove();
 
-  nodeUpdate.select("circle")
-      .attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
-      //.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-      //.style("fill", function(d) {return d._children ? colorMe(source.address) : "#FFF"});
+	nodeExit.select("circle")
+		.attr("r", 1e-6);
 
-  nodeUpdate.select("text")
-      .style("fill-opacity", 1);
+	nodeExit.select("text")
+		.style("fill-opacity", 1e-6);
 
-  // Transition exiting nodes to the parent's new position.
-  var nodeExit = node.exit().transition()
-      .duration(duration)
-      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-      .remove();
+	// Update the links.
+	var link = svg.selectAll("path.link")
+		.data(links, function(d) { return d.target.id; });
 
-  nodeExit.select("circle")
-      .attr("r", 1e-6);
-
-  nodeExit.select("text")
-      .style("fill-opacity", 1e-6);
-
-  // Update the links…
-  var link = svg.selectAll("path.link")
-      .data(links, function(d) { return d.target.id; });
-
-  // Enter any new links at the parent's previous position.
-  link.enter().insert("path", "g")
-      .attr("class", "link")
-	  	.style("stroke", function(d) { return colorMe(d.target.address) } )
-	  	.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 0.6 } ) //Hides first level.
-      .attr("d", function(d) {
+	// Enter any new links at the parent's previous position.
+	link.enter().insert("path", "g")
+		.attr("class", "link")
+		.style("stroke", function(d) { return colorMe(d.target.address) } )
+		.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 0.6 } )		// Hide first level.
+		.attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
       });
 
-  // Transition links to their new position.
-  link.transition()
-      .duration(duration)
-      .attr("d", diagonal);
+	// Transition links to their new position.
+	link.transition()
+		.duration(duration)
+		.attr("d", diagonal);
 
-  // Transition exiting nodes to the parent's new position.
-  link.exit().transition()
-      .duration(duration)
-      .attr("d", function(d) {
-        var o = {x: source.x, y: source.y};
-        return diagonal({source: o, target: o});
-      })
-      .remove();
-
-  // Stash the old positions for transition.
-  nodes.forEach(function(d) {
-    d.x0 = d.x;
-    d.y0 = d.y;
-  });
-
-  /*d3.selectAll(".node")
-		.filter(function(a){
-			if(a.name === "Geographicals") return true;
-			else return false;
+	// Transition exiting nodes to the parent's new position.
+	link.exit().transition()
+		.duration(duration)
+		.attr("d", function(d) {
+			var o = {x: source.x, y: source.y};
+			return diagonal({source: o, target: o});
 		})
-		.attr("x", 0)
-		.attr("x0", 0);*/
+		.remove();
+
+	// Stash the old positions for transition.
+	nodes.forEach(function(d) {
+		d.x0 = d.x;
+		d.y0 = d.y;
+	});
+	
 }
 
 
