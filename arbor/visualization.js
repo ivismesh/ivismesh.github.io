@@ -255,7 +255,7 @@ function update(source) {
 		else return true;
 	})
 	.append("circle")
-		.attr("r", 1e-6)
+		.attr("r", 19)
 		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
