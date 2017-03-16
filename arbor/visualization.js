@@ -121,7 +121,7 @@ d3.json("data.json", function(error, data) {
 		descToPaths = data;
 
 		searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
-		
+
 		root.children.forEach(collapse);
 		if(searchText.length > 0) {
 			search(searchText);
@@ -255,13 +255,7 @@ function update(source) {
 		else return true;
 	})
 	.append("circle")
-		.attr("r", function(d) {
-			if(d.name === searchText) {
-				return 19;
-			} else {
-				return 1e-6;
-			}
-		})
+		.attr("r", 1e-6)
 		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
@@ -305,7 +299,7 @@ function update(source) {
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
 	nodeUpdate.select("circle")
-		.attr("r", function(d) {if(d.name === searchText) return 19; else return 4.5})
+		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
 
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1);
@@ -407,7 +401,7 @@ function search(string) {
 	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === searchString) {
+			if(a.name === string) {
 				return true;
 			} else {
 				return false;
