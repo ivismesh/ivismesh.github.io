@@ -298,7 +298,8 @@ function update(source) {
 		.duration(duration)
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
-	
+	nodeUpdate.select("circle")
+		.attr("r", function(d) {if(d.name === searchText) return 19; else return 4.5;})
 
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1);
