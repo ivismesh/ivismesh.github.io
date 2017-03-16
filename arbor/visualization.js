@@ -256,8 +256,8 @@ function update(source) {
 	})
 	.append("circle")
 		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5;})
-		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
-		.style("stroke", d => treeColor(d.address))
+		.style("fill", "green")
+		.style("stroke", "green")
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
 	
 	//Use rectangles for first level.
