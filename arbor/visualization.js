@@ -20,7 +20,7 @@ var diagonal = d3.svg.diagonal()
 var zoom = d3.behavior.zoom()
     .translate([0, 0])
     .scale(1)
-    .scaleExtent([0.5, 8])
+    .scaleExtent([0.05, 8])
     .on("zoom", zoomed);
 
 // Main canvas.
@@ -299,7 +299,7 @@ function update(source) {
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
 	nodeUpdate.select("circle")
-		.attr("r", function(d) {if(d.name === searchText) return 18; else return 4.5})
+		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
 
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1);
