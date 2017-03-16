@@ -256,8 +256,8 @@ function update(source) {
 	})
 	.append("circle")
 		.attr("r", 1e-6)
-		.style("fill", d => d._children ? colorMe(d.address) : "#FFF")
-		.style("stroke", d => colorMe(d.address))
+		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
+		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
 	
 	//Use rectangles for first level.
@@ -299,7 +299,7 @@ function update(source) {
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
 	nodeUpdate.select("circle")
-		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5})
+		.attr("r", function(d) {if(d.name === searchText) return 18; else return 4.5})
 
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1);
@@ -323,7 +323,7 @@ function update(source) {
 	// Enter any new links at the parent's previous position.
 	link.enter().insert("path", "g")
 		.attr("class", "link")
-		.style("stroke", function(d) { return colorMe(d.target.address) } )
+		.style("stroke", function(d) { return treeColor(d.target.address) } )
 		.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 0.6 } )		// Hide first level.
 		.attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
@@ -379,31 +379,33 @@ function click(d) {
 
 
 function search(string) {
-
-	//Get the paths to the nodes.
+	// Get the paths to the nodes.
 	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
 
-  if(paths != undefined) history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
-  else history.replaceState(null, "search", '?searchtext=');
+	if(paths != undefined) {
+		history.replaceState(null, "search", '?searchtext=' + encodeURIComponent(string));
+	} else {
+		history.replaceState(null, "search", '?searchtext=');
+	}
 
 	console.log("Paths: ");
 	console.log(paths);
 
-	//searchTree(root, searchText);
-	//console.log(addresses);
+	// Expand the tree to the nodes.
+	root.children.forEach(collapse);
+	for(path in paths) {
+		expand(root, paths[path]);
+	}
+	update(root);
 
-	//Expand the tree to the nodes.
-  root.children.forEach(collapse);
-  for(path in paths) {
-	   expand(root, paths[path]);
-  }
-  update(root);
-
-  //Apply filters.
+	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === string) return true;
-			else return false;
+			if(a.name === string) {
+				return true;
+			} else {
+				return false;
+			}
 		})
 		.selectAll("circle")
 		.attr("r", 18)
@@ -413,7 +415,11 @@ function search(string) {
 
 
 
-function colorMe(path) {
+
+/*
+ * Returns the color for a tree corresponding to a tree letter.
+ */
+function treeColor(path) {
 	var treeName = path.slice(0,1);
 	if(treeName === "A") return colors["Anatomy"];
 	if(treeName === "B") return colors["Organisms"];
