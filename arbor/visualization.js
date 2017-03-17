@@ -8,7 +8,7 @@ var i = 0,
 	descToPaths,
 	searchText,			// The search term. This has to be updated when a new search is made.
 	nodeSize = 4.5,		// The size of each node.
-	goalNodeSize = 4.5;	// The size of the nodes representing the search term.
+	goalNodeSize = 9;	// The size of the nodes representing the search term.
 
 // Tree with variable size.
 var tree = d3.layout.tree()
@@ -39,10 +39,50 @@ function zoomed() {
 	svg.attr("transform", "translate(" + [tx, ty] + ") scale(" + d3.event.scale + ")");
 }
 
-d3.select(self.frameElement).style("height", "800px");
-
 // Container for the gradients.
 var defs = svg.append("defs");
+
+// Filter for the outside glow.
+var filter = defs.append("filter")
+	.attr("x", "-100%")
+	.attr("y", "-100%")
+	.attr("width", "300%")
+	.attr("height", "300%")
+	.attr("id","glow");
+
+filter.append("feFlood")
+	.attr("flood-color", "#FF0000")
+	.attr("flood-opacity","1")
+	.attr("result","flood");
+
+filter.append("feComposite")
+	.attr("in","flood")
+	.attr("in2","SourceGraphic")
+	.attr("operator","in")
+	.attr("result","mask");
+
+filter.append("feMorphology")
+	.attr("in","mask")
+	.attr("radius","2")
+	.attr("operator","dilate")
+	.attr("result","dilated");
+
+filter.append("feGaussianBlur")
+	.attr("in","dilated")
+	.attr("stdDeviation","3")
+	.attr("result","blurred");
+
+var feMerge = filter.append("feMerge");
+
+feMerge.append("feMergeNode")
+	.attr("in","blurred");
+
+feMerge.append("feMergeNode")
+	.attr("in","SourceGraphic");
+
+
+
+
 
 // Tree and node colors.
 var colors = {
@@ -64,88 +104,63 @@ var colors = {
 	"Geographicals": "#BDD7E7"
 }
 
-// DATA LOAD
+
+
+
+
 d3.json("data.json", function(error, data) {
 	if (error) throw error;
+
 	root = data;
+	root.x0 = height / 2;
+	root.y0 = 0;
+
 	console.log(root);
 
 	d3.json("descNodes.json", function(error, data) {
 		if (error) throw error;
+		
 		descToPaths = data;
+		
+		searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
+		
+		root.children.forEach(collapse);
+		if(searchText.length > 0) {
+			search(searchText);
+		}
+		else {
+			update(root);
+		}
+		
+		// Search form button on-click function.
+		$("#searchButton").click(function(e) {
+			e.preventDefault();
+			search($("#searchText").val());
+		});
+		// Search form on-enter function.
+		$("#searchText").bind('keydown', e => enterKey(e));
+		function enterKey(e) {
+			if(e.keyCode == 13) {
+				e.preventDefault();
+				search($("#searchText").val());
+			}
+		}
+	});
 
-    dataReady();
-  })
+	$('#searchText').focus();
+	
 });
 
-// AFTER DATA LOAD
-function dataReady() {
 
-  root.x0 = height / 2;
-	root.y0 = 0;
 
-  searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
-  // set filters
-  for(child in root.children) {
-    let filter = defs.append("filter")
-    	.attr("x", "-100%")
-    	.attr("y", "-100%")
-    	.attr("width", "400%")
-    	.attr("height", "400%")
-    	.attr("id", "glow" + root.children[child].address);
 
-    filter.append("feFlood")
-    	.attr("flood-color", treeColor(root.children[child].address))
-    	.attr("flood-opacity","1")
-    	.attr("result","flood");
-    filter.append("feComposite")
-    	.attr("in","flood")
-    	.attr("in2","SourceGraphic")
-    	.attr("operator","in")
-    	.attr("result","mask");
-    filter.append("feMorphology")
-    	.attr("in","mask")
-    	.attr("radius","3")
-    	.attr("operator","dilate")
-    	.attr("result","dilated");
-    filter.append("feGaussianBlur")
-    	.attr("in","dilated")
-    	.attr("stdDeviation","3")
-    	.attr("result","blurred");
+d3.select(self.frameElement).style("height", "800px");
 
-    let feMerge = filter.append("feMerge");
 
-    feMerge.append("feMergeNode")
-    	.attr("in","blurred");
-    feMerge.append("feMergeNode")
-    	.attr("in","SourceGraphic");
-  }
-  root.children.forEach(collapse);
-  if(searchText.length > 0) {
-    search(searchText);
-  }
-  else {
-    update(root);
-  }
 
-  // Search form button on-click function.
-  $("#searchButton").click(function(e) {
-    e.preventDefault();
-    search($("#searchText").val());
-  });
-  // Search form on-enter function.
-  $("#searchText").bind('keydown', function(e) {
-    if(e.keyCode == 13) {
-      e.preventDefault();
-      search($("#searchText").val());
-    }
-  });
 
-  $('#searchText').focus();
-}
 
-// Collaps all nodes from node d to max depth
 function collapse(d) {
   //console.log("collapsing: " + d.data.address);
 	if(d.children) {
@@ -162,6 +177,10 @@ function collapse(d) {
 		}
 	}
 }
+
+
+
+
 
 /*
  * Expands all paths to the searched nodes.
@@ -208,6 +227,9 @@ function collapse(d) {
 }
 
 
+
+
+
 function update(source) {
 
 	// Compute the new tree layout.
@@ -228,7 +250,7 @@ function update(source) {
 		.attr("class", "node")
 		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
 		.on("click", click);
-
+	
 	// Use circles for all but first level.
 	nodeEnter.filter(function(d) {
 		if(d.depth === 1) return false;
@@ -245,7 +267,7 @@ function update(source) {
 		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
-
+	
 	//Use rectangles for first level.
 	nodeEnter.filter(function(d) {
 		if(d.depth === 1) return true;
@@ -258,7 +280,7 @@ function update(source) {
 		.attr("y", -14)
 		.attr("fill", function(d) {return colors[d.name]})
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
-
+	
 	// Add labels.
 	nodeEnter.append("text")
 		.attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
@@ -341,6 +363,7 @@ function update(source) {
 		d.x0 = d.x;
 		d.y0 = d.y;
 	});
+	
 }
 
 
@@ -378,9 +401,11 @@ function search(string) {
 	} else {
 		history.replaceState(null, "search", '?searchtext=');
 	}
-
+	
 	searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
-  $('#searchText').val(searchText);
+
+	console.log("Paths: ");
+	console.log(paths);
 
 	// Expand the tree to the nodes.
 	root.children.forEach(collapse);
@@ -391,7 +416,7 @@ function search(string) {
 
 	//Apply filters.
 	d3.selectAll(".node")
-		.filter(function(a) {
+		.filter(function(a){
 			if(a.name === searchText) {
 				return true;
 			} else {
@@ -399,7 +424,7 @@ function search(string) {
 			}
 		})
 		.selectAll("circle")
-		.style("filter", function(d) { return "url(#glow" + d.address.slice(0,1) + ')' });
+		.style("filter", function(d) {return "url(#glow)"});
 }
 
 
