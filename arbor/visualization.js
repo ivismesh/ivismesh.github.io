@@ -8,7 +8,7 @@ var i = 0,
 	descToPaths,
 	searchText,			// The search term. This has to be updated when a new search is made.
 	nodeSize = 4.5,		// The size of each node.
-	goalNodeSize = 4.5;	// The size of the nodes representing the search term.
+	goalNodeSize = 8;	// The size of the nodes representing the search term.
 	
 // Tree with variable size.
 var tree = d3.layout.tree()
