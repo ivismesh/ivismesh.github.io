@@ -6,7 +6,9 @@ var i = 0,
 	duration = 750,
 	root,
 	descToPaths,
-	searchText;
+	searchText,			// The search term. This has to be updated when a new search is made.
+	nodeSize = 4.5,		// The size of each node.
+	goalNodeSize = 9;	// The size of the nodes representing the search term.
 
 // Tree with variable size.
 var tree = d3.layout.tree()
@@ -117,11 +119,11 @@ d3.json("data.json", function(error, data) {
 
 	d3.json("descNodes.json", function(error, data) {
 		if (error) throw error;
-
+		
 		descToPaths = data;
-
+		
 		searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
-
+		
 		root.children.forEach(collapse);
 		if(searchText.length > 0) {
 			search(searchText);
@@ -129,7 +131,7 @@ d3.json("data.json", function(error, data) {
 		else {
 			update(root);
 		}
-	
+		
 		// Search form button on-click function.
 		$("#searchButton").click(function(e) {
 			e.preventDefault();
@@ -255,7 +257,13 @@ function update(source) {
 		else return true;
 	})
 	.append("circle")
-		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5;})
+		.attr("r", function(d) {
+			if(d.name === searchText) {
+				return goalNodeSize;
+			} else {
+				return nodeSize;
+			}
+		})
 		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
@@ -299,7 +307,13 @@ function update(source) {
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
 	nodeUpdate.select("circle")
-		.attr("r", function(d) {if(d.name === searchText) return 9; else return 4.5;});
+		.attr("r", function(d) {
+			if(d.name === searchText) {
+				return goalNodeSize;
+			} else {
+				return nodeSize;
+			}
+		});
 
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1);
@@ -387,6 +401,8 @@ function search(string) {
 	} else {
 		history.replaceState(null, "search", '?searchtext=');
 	}
+	
+	searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
 	console.log("Paths: ");
 	console.log(paths);
@@ -401,14 +417,13 @@ function search(string) {
 	//Apply filters.
 	d3.selectAll(".node")
 		.filter(function(a){
-			if(a.name === string) {
+			if(a.name === searchText) {
 				return true;
 			} else {
 				return false;
 			}
 		})
 		.selectAll("circle")
-		.attr("r", 9)
 		.style("filter", function(d) {return "url(#glow)"});
 }
 
