@@ -266,7 +266,21 @@ function update(source) {
 				return nodeSize;
 			}
 		})
-		.style("fill", d => d._children ? treeColor(d.address) : "#FFF")
+		.style("fill", function(d) {					// Leaf nodes have white fill. Other nodes have colored fill.
+			if(d.children || d._children) {
+				return treeColor(d.address);
+			} else {
+				return "White";
+			}
+		})
+		.style("filter", function(d) {
+			if(d.name === searchText) {
+				return "url(#glow)";
+			} else {
+				return null;
+			}
+			
+		})
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
 	
@@ -296,7 +310,7 @@ function update(source) {
 				return 10;
 			}
 		})
-		.attr("dx", function(d) {
+		.attr("dx", function(d) {					// Offset the text at searched nodes so it doesn't overlap the larger nodes.
 			if(d.name === searchText) {
 				if(d.children || d._children) {
 					return "-0.5em";
@@ -329,8 +343,13 @@ function update(source) {
 		})
 		.on('mouseout', function(d) {
 			d3.select(this).text(d => d.name.slice(0, 39));
+		})
+		.on('click', function(d) {
+			window.location.href = "/arbor/?searchtext=" + d.name;
 		});
-
+	
+	
+	
 	// Transition nodes to their new position.
 	var nodeUpdate = node.transition()
 		.duration(duration)
@@ -343,11 +362,42 @@ function update(source) {
 			} else {
 				return nodeSize;
 			}
+		})
+		.style("filter", function(d) {
+			if(d.name === searchText) {
+				return "url(#glow)";
+			} else {
+				return null;
+			}
+			
 		});
-
+	
 	nodeUpdate.select("text")
-		.style("fill-opacity", 1);
-
+		.style("fill-opacity", 1)
+		.attr("dx", function(d) {					// Offset the text at searched nodes so it doesn't overlap the larger nodes.
+			if(d.name === searchText) {
+				if(d.children || d._children) {
+					return "-0.5em";
+				} else {
+					return "0.5em";
+				}
+			} else {
+				return "0em";
+			}
+		})
+		.style("font-weight", function(d) {			// Make searched nodes have bold text.
+			console.log("a");
+			console.log(searchText);
+			if(d.name === searchText) {
+				console.log("test");
+				return "bold";
+			} else {
+				return "normal";
+			}
+		});
+	
+	
+	
 	// Transition exiting nodes to the parent's new position.
 	var nodeExit = node.exit().transition()
 		.duration(duration)
