@@ -89,11 +89,11 @@ form {
 
 .node text {
   font: 15px Lato;
-  /*paint-order: stroke;
+  paint-order: stroke;
   stroke: #FFF;
   stroke-width: 2px;
   stroke-linecap: butt;
-  stroke-linejoin: miter;*/
+  stroke-linejoin: miter;
 }
 
 .node {
