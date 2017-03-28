@@ -14,7 +14,7 @@ var i = 0,
 var tree = d3.layout.tree()
 	.nodeSize([25, 25]);
 
-// Cureved lines.
+// Cureved lines generator.
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
@@ -33,6 +33,7 @@ var svg = d3.select("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// Zoom translate and scale.
 function zoomed() {
 	var tx = Math.min(150, d3.event.translate[0]),
 		ty = d3.event.translate[1];
@@ -86,28 +87,29 @@ feMerge.append("feMergeNode")
 
 // Tree and node colors.
 var colors = {
-	"Anatomy": "#C189C4",
-	"Organisms": "#C8457F",
-	"Diseases": "#795548",
-	"Chemicals and Drugs": "#FFA500",
-	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#A63603",
-	"Psychiatry and Psychology": "#E6550D",
-	"Phenomena and Processes": "#FD8D3C",
-	"Disciplines and Occupations": "#FDBE85",
-	"Anthropology, Education, Sociology, and Social Phenomena": "#006D2C",
-	"Technology, Industry, and Agriculture": "#31A354",
-	"Humanities": "#74C476",
-	"Information Science": "#BAE4B3",
-	"Named Groups": "#08519C",
-	"Health Care": "#3182BD",
-	"Publication Characteristics": "#6BAED6",
-	"Geographicals": "#BDD7E7"
+	"Anatomy": "#BDBDBD",
+	"Organisms": "#BF812D",
+	"Diseases": "#D9D9D9",
+	"Chemicals and Drugs": "#DFC27D",
+	"Analytical, Diagnostic and Therapeutic Techniques, and Equipment": "#F6E8C3",
+	"Psychiatry and Psychology": "#FE9929",
+	"Phenomena and Processes": "#FEC44F",
+	"Disciplines and Occupations": "#FEE391",
+	"Anthropology, Education, Sociology, and Social Phenomena": "#41AB5D",
+	"Technology, Industry, and Agriculture": "#74C476",
+	"Humanities": "#A1D99B",
+	"Information Science": "#C7E9C0",
+	"Named Groups": "#6BAED6",
+	"Health Care": "#9ECAE1",
+	"Publication Characteristics": "#C6DBEF",
+	"Geographicals": "#DEEBF7"
 }
 
 
 
 
 
+// Load data.
 d3.json("data.json", function(error, data) {
 	if (error) throw error;
 
@@ -283,7 +285,28 @@ function update(source) {
 	
 	// Add labels.
 	nodeEnter.append("text")
-		.attr("x", function(d) { if(d.depth === 1) return -25; else return d.children || d._children ? -10 : 10; })
+		.attr("x", function(d) {
+			if(d.depth === 1) {
+				return -25;
+			}
+			else if(d.children || d._children) {
+				return -10
+			}
+			else {
+				return 10;
+			}
+		})
+		.attr("dx", function(d) {
+			if(d.name === searchText) {
+				if(d.children || d._children) {
+					return "-0.5em";
+				} else {
+					return "0.5em";
+				}
+			} else {
+				return "0em";
+			}
+		})
 		.attr("dy", ".35em")
 		.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
 		.attr('class', d => d.name.length < 18 ? 'fulltext' : 'shorttext')
@@ -291,6 +314,13 @@ function update(source) {
 			return d.name.length < 40 ? d.name : d.name.slice(0, 39);
 		})
 		.style("fill-opacity", 1e-6)
+		.style("font-weight", function(d) {			// Make searched nodes have bold text.
+			if(d.name === searchText) {
+				return "bold";
+			} else {
+				return "normal";
+			}
+		})
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;}) // Hide first level.
 		.on('mouseover', function(d) {
 			if(d.name.length > 40) {
@@ -338,7 +368,7 @@ function update(source) {
 	link.enter().insert("path", "g")
 		.attr("class", "link")
 		.style("stroke", function(d) { return treeColor(d.target.address) } )
-		.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 0.6 } )		// Hide first level.
+		.attr("opacity", function(d) { return d.source.depth == 0 ? 0 : 1 } )		// Hide first level.
 		.attr("d", function(d) {
         var o = {x: source.x0, y: source.y0};
         return diagonal({source: o, target: o});
@@ -414,7 +444,7 @@ function search(string) {
 	}
 	update(root);
 
-	//Apply filters.
+	//Apply glow filter to searched nodes.
 	d3.selectAll(".node")
 		.filter(function(a){
 			if(a.name === searchText) {
