@@ -109,7 +109,18 @@ var colors = {
 
 
 
-// Load data.
+// Load the definitions.
+var definitions;
+
+d3.csv("definitions.csv", function(error, data) {
+	definitions = data;
+});
+
+
+
+
+
+// Load the tree structure.
 d3.json("data.json", function(error, data) {
 	if (error) throw error;
 
@@ -363,13 +374,7 @@ function update(source) {
 				return nodeSize;
 			}
 		})
-		.style("fill", function(d) {					// Nodes which can be expanded have colored fill. Other nodes have white fill.
-			if(d._children) {
-				return treeColor(d.address);
-			} else {
-				return "White";
-			}
-		})
+		
 		.style("filter", function(d) {					// Searched nodes have glow.
 			if(d.name === searchText) {
 				return "url(#glow)";
@@ -500,6 +505,8 @@ function search(string) {
 		expand(root, paths[path]);
 	}
 	update(root);
+	
+	updateDescription();
 
 	//Apply glow filter to searched nodes.
 	d3.selectAll(".node")
@@ -539,4 +546,19 @@ function treeColor(path) {
 	if(treeName === "N") return colors["Health Care"];
 	if(treeName === "V") return colors["Publication Characteristics"];
 	if(treeName === "Z") return colors["Geographicals"];
+}
+
+
+
+
+
+/*
+ * Updates the "definition" panel to show the definition of thew searched term.
+ */
+function updateDescription() {
+	for(var i = 0; i < definitions.length; i++) {
+		if(definitions[i].mesh_eng === searchText) {
+			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
+		}
+	}
 }
