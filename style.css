@@ -14,12 +14,34 @@ h4 {
 	color: #106844;
 }
 
+#contribution > h4 {
+	margin-top: 30px;
+}
+
+#contribution > p {
+	margin-bottom: 20px;
+}
+
+h5 {
+	font: 400 15px Lato;
+	color: #303030;
+	font-weight: bold;
+}
+
+.row {
+	margin: 0px;
+}
+
 .bg-green {
 	background-color: #b0ca3b;
 }
 
-.container-fluid-padding {
-    padding: 60px 50px 50px 50px;
+.container-top {
+  padding: 60px 50px 50px 50px;
+ }
+
+ .container-body {
+ 	padding: 50px 0 50px 0px;
  }
 
 .navbar {
@@ -92,4 +114,18 @@ form {
   margin-bottom: 1em;
   margin-right: 1em;
   border-radius: 6px;
+}
+
+.dev-image {
+	width: 200px;
+	height: 200px;
+	object-fit: cover; /* Do not scale the image */
+	margin: auto;
+	border-radius: 50%;
+	background-repeat: no-repeat;
+	background-size: 100%
+}
+
+p {
+  margin: 0.5em;
 }
