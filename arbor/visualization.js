@@ -9,6 +9,8 @@ var i = 0,
 	searchText,			// The search term. This has to be updated when a new search is made.
 	nodeSize = 4.5,		// The size of each node.
 	goalNodeSize = 8;	// The size of the nodes representing the search term.
+
+var doScaleAndCenter = true;	// Determines if the tree should be scaled and centered on screen.
 	
 // Tree with variable size.
 var tree = d3.layout.tree()
@@ -31,6 +33,7 @@ var svg = d3.select("svg")
     .attr("height", height + margin.top + margin.bottom)
 	.call(zoom)
   .append("g")
+	.attr("id", "container")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // Zoom translate and scale.
@@ -128,7 +131,7 @@ d3.json("data.json", function(error, data) {
 	root.x0 = height / 2;
 	root.y0 = 0;
 
-	console.log(root);
+	//console.log(root);
 
 	d3.json("descNodes.json", function(error, data) {
 		if (error) throw error;
@@ -244,7 +247,17 @@ function collapse(d) {
 
 
 function update(source) {
-
+	
+	// Use timer to know when transitions are complete.
+	var timer = null,
+		timerFunc = function () {
+			if(doScaleAndCenter === true)scaleAndCenter();					// When transitions completed scale and center.
+    };
+	
+	
+	
+	// Create new nodes.
+	
 	// Compute the new tree layout.
 	var nodes = tree.nodes(root).reverse(),
 		links = tree.links(nodes);
@@ -262,7 +275,7 @@ function update(source) {
 	var nodeEnter = node.enter().append("g")
 		.attr("class", "node")
 		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-		.on("click", click);
+		.on("click", function(d) {doScaleAndCenter = false; center(d); click(d)});
 	
 	// Use circles for all but first level.
 	nodeEnter.filter(function(d) {
@@ -356,14 +369,21 @@ function update(source) {
 			d3.select(this).text(d => d.name.slice(0, 39));
 		})
 		.on('click', function(d) {
-			window.location.href = "/arbor/?searchtext=" + d.name;
+			//scaleAndCenter();
+			//window.location.href = "/arbor/?searchtext=" + d.name;
 		});
 	
 	
 	
+	// Update nodes.
+	
 	// Transition nodes to their new position.
 	var nodeUpdate = node.transition()
 		.duration(duration)
+		.each("end", function() {					// Reset the timer.
+			clearTimeout(timer);
+			timer = setTimeout(timerFunc, 1);
+		})
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
 	nodeUpdate.select("circle")					// Searched nodes are larger than other nodes.
@@ -374,7 +394,13 @@ function update(source) {
 				return nodeSize;
 			}
 		})
-		
+		.style("fill", function(d) {					// Nodes which can be expanded have colored fill. Other nodes have white fill.
+			if(d._children) {
+				return treeColor(d.address);
+			} else {
+				return "White";
+			}
+		})
 		.style("filter", function(d) {					// Searched nodes have glow.
 			if(d.name === searchText) {
 				return "url(#glow)";
@@ -398,10 +424,7 @@ function update(source) {
 			}
 		})
 		.style("font-weight", function(d) {			// Make searched nodes have bold text.
-			console.log("a");
-			console.log(searchText);
 			if(d.name === searchText) {
-				console.log("test");
 				return "bold";
 			} else {
 				return "normal";
@@ -409,6 +432,8 @@ function update(source) {
 		});
 	
 	
+	
+	// Remove old nodes.
 	
 	// Transition exiting nodes to the parent's new position.
 	var nodeExit = node.exit().transition()
@@ -456,6 +481,8 @@ function update(source) {
 		d.y0 = d.y;
 	});
 	
+	
+	
 }
 
 
@@ -485,6 +512,8 @@ function click(d) {
 
 
 function search(string) {
+	doScaleAndCenter = true;
+	
 	// Get the paths to the nodes.
 	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
 
@@ -496,8 +525,8 @@ function search(string) {
 	
 	searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
-	console.log("Paths: ");
-	console.log(paths);
+	//console.log("Paths: ");
+	//console.log(paths);
 
 	// Expand the tree to the nodes.
 	root.children.forEach(collapse);
@@ -507,7 +536,7 @@ function search(string) {
 	update(root);
 	
 	updateDescription();
-
+	
 	//Apply glow filter to searched nodes.
 	d3.selectAll(".node")
 		.filter(function(a){
@@ -569,4 +598,39 @@ function updateDescription() {
 	}
 	document.getElementById("pubmed").href = ref;
 	document.getElementById("pubmed").innerHTML = ref;
+}
+
+
+
+
+
+/*
+ * Scales and centers the tree on screen.
+ */
+function scaleAndCenter() {
+	var bbox = svg.node().getBBox();
+	var scale = 1.2 / Math.max((bbox.width - bbox.x) / width, (bbox.height - bbox.y) / height);
+	var translate = [(- bbox.x - bbox.width / 2) * scale + (width/2), (- bbox.y - bbox.height / 2) * scale + (height/2)];
+	
+	d3.select("g")
+		.transition()
+		.duration(800)
+		.attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+	
+	/*
+	d3.select("g")
+		.transition()
+		.call(zoom
+			.translate(translate)
+			.scale(scale).event
+		);
+	*/
+}
+
+
+
+
+
+function center(node) {
+	
 }
