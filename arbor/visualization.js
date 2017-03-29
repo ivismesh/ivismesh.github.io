@@ -259,21 +259,21 @@ function update(source) {
 		else return true;
 	})
 	.append("circle")
-		.attr("r", function(d) {
-			if(d.name === searchText) {
+		.attr("r", function(d) {					// Searched nodes are larger than other nodes.
+			if(d.name === searchText) {					
 				return goalNodeSize;
 			} else {
 				return nodeSize;
 			}
 		})
-		.style("fill", function(d) {					// Leaf nodes have white fill. Other nodes have colored fill.
-			if(d.children || d._children) {
+		.style("fill", function(d) {					// Nodes which can be expanded have colored fill. Other nodes have white fill.
+			if(d._children) {
 				return treeColor(d.address);
 			} else {
 				return "White";
 			}
 		})
-		.style("filter", function(d) {
+		.style("filter", function(d) {					// Searched nodes have a glow.
 			if(d.name === searchText) {
 				return "url(#glow)";
 			} else {
@@ -355,7 +355,7 @@ function update(source) {
 		.duration(duration)
 		.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
-	nodeUpdate.select("circle")
+	nodeUpdate.select("circle")					// Searched nodes are larger than other nodes.
 		.attr("r", function(d) {
 			if(d.name === searchText) {
 				return goalNodeSize;
@@ -363,7 +363,14 @@ function update(source) {
 				return nodeSize;
 			}
 		})
-		.style("filter", function(d) {
+		.style("fill", function(d) {					// Nodes which can be expanded have colored fill. Other nodes have white fill.
+			if(d._children) {
+				return treeColor(d.address);
+			} else {
+				return "White";
+			}
+		})
+		.style("filter", function(d) {					// Searched nodes have glow.
 			if(d.name === searchText) {
 				return "url(#glow)";
 			} else {
