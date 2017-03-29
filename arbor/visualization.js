@@ -553,12 +553,20 @@ function treeColor(path) {
 
 
 /*
- * Updates the "definition" panel to show the definition of thew searched term.
+ * Updates the "definition" panel to show the definition of the searched term. Also adds a link to pubmed.
  */
 function updateDescription() {
+	var ref = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";
+	for(var i = 0; i < searchText.length; i++) {
+		ref = ref + searchText[i];
+	}
+	ref = ref.replace(/\s/g, "+");
+	
 	for(var i = 0; i < definitions.length; i++) {
 		if(definitions[i].mesh_eng === searchText) {
 			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
 		}
 	}
+	document.getElementById("pubmed").href = ref;
+	document.getElementById("pubmed").innerHTML = ref;
 }
