@@ -111,8 +111,8 @@
 						stated above:
 						<ul>
 							<li>
-								The nodes representing the search term have a bold text label. The text label of these nodes are also offset 
-								slightly in the horizontal direction in order to add some space between the label and the larger node.
+								The nodes representing the search term have bold text labels. The text labels of these nodes are also offset 
+								slightly in the horizontal direction in order to add some space between the labels and the larger nodes.
 							</li>
 							<li>
 								When you click on the text label of a node, a new search is initiated for that term.
@@ -125,6 +125,38 @@
 								The tree is zoomed and panned to fit on the screen when loading the page and when making a new search.
 							</li>
 						</ul>
+					</p>
+					
+					<h5>Visualization Color Palettes</h5>
+					<p>
+						When it was decided that every tree in the visualization should have a separate color I made some research into 
+						color theory. Since the visualization has 16 trees it would also need 16 different colors. I initially looked 
+						into dividing the color circle into 16 different hues, while keeping the same saturation and value. However, 
+						this did not yield the desired result as some of the colors were to similar to be able to be used as representations 
+						of different categories. Also, some of the colors could not be displayed adjacent to each other sine they were too far 
+						apart on the color circle.
+					</p>
+					<p>
+						I therefore ended up using a combination of different hues, saturations and values. The final colors were selected 
+						based on the following criteria:
+						<ul>
+							<li>
+								The color has to have enough saturation that it is distinguishable from the white background.
+							</li>
+							<li>
+								The color has to provide a good enough contrast to the black text which is displayed in front of it.
+							</li>
+							<li>
+								The color has to be distinguishable from the other colors, when they are adjacent.
+							</li>
+							<li>
+								The color should not be similar to the red glow color which is used to highlight nodes.
+							</li>
+						</ul>
+					</p>
+					<p>
+						Some of the tested color palettes as well as the final one is available at <a href="https://ivismesh.github.io/individual/jonatan/color_palettes.jpg">ivismesh.github.io/individual/jonatan/color_palettes.jpg</a>
+						The final color palette is the one at the top, which is also shown in comparison to some black text.
 					</p>
 
 					<h4>What I have learned</h4>
