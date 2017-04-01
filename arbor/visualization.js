@@ -275,7 +275,7 @@ function update(source) {
 	var nodeEnter = node.enter().append("g")
 		.attr("class", "node")
 		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-		.on("click", function(d) {doScaleAndCenter = false; center(d); click(d)});
+		.on("click", function(d) {doScaleAndCenter = false; click(d)});
 	
 	// Use circles for all but first level.
 	nodeEnter.filter(function(d) {
@@ -369,8 +369,7 @@ function update(source) {
 			d3.select(this).text(d => d.name.slice(0, 39));
 		})
 		.on('click', function(d) {
-			//scaleAndCenter();
-			//window.location.href = "/arbor/?searchtext=" + d.name;
+			window.location.href = "/arbor/?searchtext=" + d.name;
 		});
 	
 	
@@ -625,12 +624,4 @@ function scaleAndCenter() {
 			.scale(scale).event
 		);
 	*/
-}
-
-
-
-
-
-function center(node) {
-	
 }
