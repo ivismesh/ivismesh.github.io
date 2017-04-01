@@ -59,6 +59,51 @@
 						all broader terms. A screenshot of this prototype is available at <a href="https://ivismesh.github.io/individual/jonatan/lists/prototype_lists_screen.jpg">ivismesh.github.io/individual/jonatan/lists/prototype_lists_screen.jpg</a><br>
 						The working prototype is available at <a href="https://ivismesh.github.io/individual/jonatan/lists/">ivismesh.github.io/individual/jonatan/lists/</a>
 					</p>
+					
+					<h5>First version of final visualization</h5>
+					<p>
+						After we had decided on some of the visual structures and overall design principles I developed the first version of what would 
+						evolve into our final visualization. The following is the functionality which was implemented in the first version but not 
+						kept in the final version:
+						<ul>
+							<li>
+								Every node in the path to the search term was expanded. The node representing the search term was not 
+								expanded.
+							</li>
+							<li>
+								All trees had the same color.
+							</li>
+						</ul>
+						The following is the functionality which was implemented in the first version and was kept in the final version:
+						<ul>
+							<li>
+								The data is represented as a horizontal tree. Going from left to right. As you go from left to right 
+								the nodes represents narrower terms.
+							</li>
+							<li>
+								The root nodes are visualized as a vertical row of rectangles. Each root node has a separate color. 
+								Each root node has its text label on the left side.
+							</li>
+							<li>
+								Nodes can be expanded and contracted by clicking on them.
+							</li>
+							<li>
+								When searching for a term, the paths to the nodes representing that term are expanded.
+							</li>
+							<li>
+								Nodes which can be expanded to show additional nodes are filled (have a colored fill) and have 
+								the text label on the left side. All other nodes are empty (have a white fill) and have the 
+								text label on the right side. The exception to this is the root nodes.
+							</li>
+							<li>
+								The nodes which represents the search term are slightly larger than the other nodes and have a glow. 
+								The color of the glow is separate from the colors of the trees.
+							</li>
+							<li>
+								The tree can be zoomed and panned.
+							</li>
+						</ul>
+					</p>
 
 					<h4>What I have learned</h4>
 					<p>What did you learn from contributing to the project. </p>
