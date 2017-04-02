@@ -591,7 +591,7 @@ function updateDescription() {
 	ref = ref.replace(/\s/g, "+");
 
 	for(var i = 0; i < 24778; i++) {
-		if(definitions[i].mesh_eng === searchText) {
+		if(definitions[i].mesh_eng == searchText) {
 			document.getElementById("description").innerHTML = definitions[0].scope_note_eng;
 		}
 	}
