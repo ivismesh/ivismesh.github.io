@@ -10,6 +10,7 @@ body {
 }
 
 h4 {
+  margin-top: 0px;
 	color: #106844;
 }
 
@@ -22,7 +23,7 @@ h4 {
  }
 
 .mesh-padding {
-	padding-top: 60px;
+	padding-top: 52px;
 }
 
 /* NAVIGATION */
@@ -74,7 +75,7 @@ form {
 	border-bottom: 1px solid #FFF;
 	color: #FFF;
 	box-shadow: none;
-	font-size: 14pt;
+	font-size: 12pt;
 	border-radius: 0px;
 }
 
@@ -113,6 +114,23 @@ form {
 }
 
 /* RIGHT PANEL */
+#right-panel {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  overflow: hidden;
+}
+
+#minimize-btn {
+  padding: 0px 5px;
+  margin-bottom : 2px;
+  border: 0;
+}
+
+.glyphcon-minus {
+  margin: 0;
+}
+
 .text-box {
   background-color: #b0ca3b;
   padding: 1em 1.3em;
