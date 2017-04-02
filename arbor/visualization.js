@@ -11,7 +11,7 @@ var i = 0,
 	goalNodeSize = 8;	// The size of the nodes representing the search term.
 
 var doScaleAndCenter = true;	// Determines if the tree should be scaled and centered on screen.
-
+	
 // Tree with variable size.
 var tree = d3.layout.tree()
 	.nodeSize([25, 25]);
@@ -133,15 +133,15 @@ d3.json("data.json", function(error, data) {
 
 	d3.json("descNodes.json", function(error, data) {
 		if (error) throw error;
-
+		
 		descToPaths = data;
-
+			
 			// Load the definitions.
 			d3.csv("definitions.csv", function(error, data) {
 				definitions = data;
-
+				
 				searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
-
+			
 				root.children.forEach(collapse);
 				if(searchText.length > 0) {
 					search(searchText);
@@ -149,7 +149,7 @@ d3.json("data.json", function(error, data) {
 				else {
 					update(root);
 				}
-
+				
 				// Search form button on-click function.
 				$("#searchButton").click(function(e) {
 					e.preventDefault();
@@ -164,12 +164,12 @@ d3.json("data.json", function(error, data) {
 					}
 				}
 			});
-
-
+			
+			
 	});
 
 	$('#searchText').focus();
-
+	
 });
 
 
@@ -252,17 +252,17 @@ function collapse(d) {
 
 
 function update(source) {
-
+	
 	// Use timer to know when transitions are complete.
 	var timer = null,
 		timerFunc = function () {
 			if(doScaleAndCenter === true)scaleAndCenter();					// When transitions completed scale and center.
     };
-
-
-
+	
+	
+	
 	// Create new nodes.
-
+	
 	// Compute the new tree layout.
 	var nodes = tree.nodes(root).reverse(),
 		links = tree.links(nodes);
@@ -281,7 +281,7 @@ function update(source) {
 		.attr("class", "node")
 		.attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
 		.on("click", function(d) {doScaleAndCenter = false; click(d)});
-
+	
 	// Use circles for all but first level.
 	nodeEnter.filter(function(d) {
 		if(d.depth === 1) return false;
@@ -289,7 +289,7 @@ function update(source) {
 	})
 	.append("circle")
 		.attr("r", function(d) {					// Searched nodes are larger than other nodes.
-			if(d.name === searchText) {
+			if(d.name === searchText) {					
 				return goalNodeSize;
 			} else {
 				return nodeSize;
@@ -308,11 +308,11 @@ function update(source) {
 			} else {
 				return null;
 			}
-
+			
 		})
 		.style("stroke", d => treeColor(d.address))
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
-
+	
 	//Use rectangles for first level.
 	nodeEnter.filter(function(d) {
 		if(d.depth === 1) return true;
@@ -325,7 +325,7 @@ function update(source) {
 		.attr("y", -14)
 		.attr("fill", function(d) {return colors[d.name]})
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;});		// Hide first level.
-
+	
 	// Add labels.
 	nodeEnter.append("text")
 		.attr("x", function(d) {
@@ -376,11 +376,11 @@ function update(source) {
 		.on('click', function(d) {
 			window.location.href = "/arbor/?searchtext=" + d.name;
 		});
-
-
-
+	
+	
+	
 	// Update nodes.
-
+	
 	// Transition nodes to their new position.
 	var nodeUpdate = node.transition()
 		.duration(duration)
@@ -411,9 +411,9 @@ function update(source) {
 			} else {
 				return null;
 			}
-
+			
 		});
-
+	
 	nodeUpdate.select("text")
 		.style("fill-opacity", 1)
 		.attr("dx", function(d) {					// Offset the text at searched nodes so it doesn't overlap the larger nodes.
@@ -434,11 +434,11 @@ function update(source) {
 				return "normal";
 			}
 		});
-
-
-
+	
+	
+	
 	// Remove old nodes.
-
+	
 	// Transition exiting nodes to the parent's new position.
 	var nodeExit = node.exit().transition()
 		.duration(duration)
@@ -484,9 +484,9 @@ function update(source) {
 		d.x0 = d.x;
 		d.y0 = d.y;
 	});
-
-
-
+	
+	
+	
 }
 
 
@@ -517,7 +517,7 @@ function click(d) {
 
 function search(string) {
 	doScaleAndCenter = true;
-
+	
 	// Get the paths to the nodes.
 	var paths = descToPaths[string.replace(/ /g, '').toLowerCase()];
 
@@ -526,7 +526,7 @@ function search(string) {
 	} else {
 		history.replaceState(null, "search", '?searchtext=');
 	}
-
+	
 	searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
 	//console.log("Paths: ");
@@ -538,9 +538,9 @@ function search(string) {
 		expand(root, paths[path]);
 	}
 	update(root);
-
+	
 	updateDescription();
-
+	
 	//Apply glow filter to searched nodes.
 	d3.selectAll(".node")
 		.filter(function(a){
@@ -594,17 +594,10 @@ function updateDescription() {
 		ref = ref + searchText[i];
 	}
 	ref = ref.replace(/\s/g, "+");
-
-
-	for(var i = 0; i < 24778; i++) {
-		if(definitions[i].mesh_eng == searchText) {
-			document.getElementById("description").innerHTML = definitions[0].scope_note_eng;
-
-
+	
 	for(var i = 0; i < definitions.length; i++) {
 		if(definitions[i].mesh_eng === searchText) {
 			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
-
 		}
 	}
 	document.getElementById("pubmed").href = ref;
@@ -622,14 +615,14 @@ function scaleAndCenter() {
 	var bbox = svg.node().getBBox();
 	var scale = 1.2 / Math.max((bbox.width - bbox.x) / width, (bbox.height - bbox.y) / height);
 	var translate = [(- bbox.x - bbox.width / 2) * scale + (width/2), (- bbox.y - bbox.height / 2) * scale + (height/2)];
-
+	
 	/*
 	d3.select("g")
 		.transition()
 		.duration(800)
 		.attr("transform", "translate(" + translate + ")scale(" + scale + ")");
 	*/
-
+	
 	d3.select("g")
 		.transition()
 		.duration(800)
@@ -637,5 +630,5 @@ function scaleAndCenter() {
 			.translate(translate)
 			.scale(scale).event
 		);
-
+	
 }
