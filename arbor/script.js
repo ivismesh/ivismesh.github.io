@@ -13,7 +13,12 @@ $(document).ready(function() {
 function minimize(){
   $('#minimize-btn').removeClass('glyphicon-chevron-up');
   $('#minimize-btn').addClass('glyphicon-chevron-down');
-  $('#right-panel').css("height", "24px");
+  $( "#right-panel" ).animate({
+    height: "24px"
+  }, 200, function() {
+    // Animation complete.
+  });
+  //$('#right-panel').css("height", "24px");
 }
 
 function maximize(){
