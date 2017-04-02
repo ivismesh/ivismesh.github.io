@@ -116,7 +116,6 @@ var colors = {
 var definitions;
 
 d3.csv("csvREAL.csv", function(error, data) {
-  console.log("hi");
 	definitions = data;
 });
 
@@ -593,7 +592,7 @@ function updateDescription() {
 
 	for(var i = 0; i < definitions.length; i++) {
 		if(definitions[i].mesh_eng === searchText) {
-			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
+			document.getElementById("description").innerHTML = definitions[0].scope_note_eng;
 		}
 	}
 	document.getElementById("pubmed").href = ref;
