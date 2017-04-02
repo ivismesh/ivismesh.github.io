@@ -116,6 +116,7 @@ var colors = {
 var definitions;
 
 d3.csv("csvREAL.csv", function(error, data) {
+  console.log("hi");
 	definitions = data;
 });
 
