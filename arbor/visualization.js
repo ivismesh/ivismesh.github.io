@@ -611,17 +611,19 @@ function scaleAndCenter() {
 	var scale = 1.2 / Math.max((bbox.width - bbox.x) / width, (bbox.height - bbox.y) / height);
 	var translate = [(- bbox.x - bbox.width / 2) * scale + (width/2), (- bbox.y - bbox.height / 2) * scale + (height/2)];
 	
+	/*
 	d3.select("g")
 		.transition()
 		.duration(800)
 		.attr("transform", "translate(" + translate + ")scale(" + scale + ")");
+	*/
 	
-	/*
 	d3.select("g")
 		.transition()
+		.duration(800)
 		.call(zoom
 			.translate(translate)
 			.scale(scale).event
 		);
-	*/
+	
 }
