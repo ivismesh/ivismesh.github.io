@@ -118,4 +118,5 @@ form {
   padding: 1em 1.3em;
   margin-bottom: 1em;
   border-radius: 6px;
+  word-wrap: break-word;
 }
