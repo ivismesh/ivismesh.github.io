@@ -38,7 +38,7 @@ var svg = d3.select("svg")
 
 // Zoom translate and scale.
 function zoomed() {
-	var tx = Math.min(150, d3.event.translate[0]),
+	var tx = Math.min(15, d3.event.translate[0]),
 		ty = d3.event.translate[1];
 	svg.attr("transform", "translate(" + [tx, ty] + ") scale(" + d3.event.scale + ")");
 }
@@ -112,12 +112,10 @@ var colors = {
 
 
 
-// Load the definitions.
+// The definitions.
 var definitions;
 
-d3.csv("csvREAL.csv", function(error, data) {
-	definitions = data;
-});
+
 
 
 
@@ -138,29 +136,36 @@ d3.json("data.json", function(error, data) {
 
 		descToPaths = data;
 
-		searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
+			// Load the definitions.
+			d3.csv("definitions.csv", function(error, data) {
+				definitions = data;
 
-		root.children.forEach(collapse);
-		if(searchText.length > 0) {
-			search(searchText);
-		}
-		else {
-			update(root);
-		}
+				searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
 
-		// Search form button on-click function.
-		$("#searchButton").click(function(e) {
-			e.preventDefault();
-			search($("#searchText").val());
-		});
-		// Search form on-enter function.
-		$("#searchText").bind('keydown', e => enterKey(e));
-		function enterKey(e) {
-			if(e.keyCode == 13) {
-				e.preventDefault();
-				search($("#searchText").val());
-			}
-		}
+				root.children.forEach(collapse);
+				if(searchText.length > 0) {
+					search(searchText);
+				}
+				else {
+					update(root);
+				}
+
+				// Search form button on-click function.
+				$("#searchButton").click(function(e) {
+					e.preventDefault();
+					search($("#searchText").val());
+				});
+				// Search form on-enter function.
+				$("#searchText").bind('keydown', e => enterKey(e));
+				function enterKey(e) {
+					if(e.keyCode == 13) {
+						e.preventDefault();
+						search($("#searchText").val());
+					}
+				}
+			});
+
+
 	});
 
 	$('#searchText').focus();
@@ -590,9 +595,16 @@ function updateDescription() {
 	}
 	ref = ref.replace(/\s/g, "+");
 
+
 	for(var i = 0; i < 24778; i++) {
 		if(definitions[i].mesh_eng == searchText) {
 			document.getElementById("description").innerHTML = definitions[0].scope_note_eng;
+
+
+	for(var i = 0; i < definitions.length; i++) {
+		if(definitions[i].mesh_eng === searchText) {
+			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
+
 		}
 	}
 	document.getElementById("pubmed").href = ref;
