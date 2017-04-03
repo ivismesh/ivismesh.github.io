@@ -137,7 +137,7 @@ d3.json("data.json", function(error, data) {
 		descToPaths = data;
 
 			// Load the definitions.
-			d3.csv("csvtest.csv", function(error, data) {
+			d3.csv("definitions.csv", function(error, data) {
 				definitions = data;
 
 				searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
@@ -603,9 +603,9 @@ function updateDescription() {
 	for(var i = 0; i < definitions.length; i++) {
 		if(definitions[i].mesh_eng.toUpperCase() === searchText.toUpperCase()) {
 			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
-      document.getElementById("svenskdesc").innerHTML = definitions[i].svmesh;
-      console.log("hi");
-      console.log(definitions[0].svmesh)
+      // document.getElementById("svenskdesc").innerHTML = definitions[i].svmesh;
+      // console.log("hi");
+      // console.log(definitions[0].svmesh)
 			kib = kib.concat(definitions[i].uniqueID);
       publinkname = definitions[i].mesh_eng;
 		}
