@@ -610,8 +610,8 @@ function updateDescription() {
 
   name = name.concat(" on PubMed");
 	// Update the DOM.
-	document.getElementById("synonyms").href = ref;
-	document.getElementById("synonyms").innerHTML = name;
+	document.getElementById("syntext").href = ref;
+	document.getElementById("syntext").innerHTML = name;
 	document.getElementById("kibki").href = kib;
 	document.getElementById("kibki").innerHTML = "Link to Svensk MeSH";
 }
