@@ -609,9 +609,7 @@ function updateDescription() {
 
 	// Update the DOM.
 	document.getElementById("pubmed").href = ref;
-	document.getElementById("pubmed").innerHTML = ref;
 	document.getElementById("kibki").href = kib;
-	document.getElementById("kibki").innerHTML = kib;
 }
 
 
