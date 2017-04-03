@@ -608,10 +608,11 @@ function updateDescription() {
 		}
 	}
 
-  publinkname = publinkname.concat(" on PubMed");
+
+  var nametodisplay = publinkname + " on PubMed";
 	// Update the DOM.
 	document.getElementById("syntext").href = ref;
-	document.getElementById("syntext").innerHTML = publinkname;
+	document.getElementById("syntext").innerHTML = nametodisplay;
 	document.getElementById("kibki").href = kib;
 	document.getElementById("kibki").innerHTML = "Link to Svensk MeSH";
 }
