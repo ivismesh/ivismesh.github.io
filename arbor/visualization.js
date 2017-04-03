@@ -592,7 +592,7 @@ function treeColor(path) {
 function updateDescription() {
 	var ref = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";					// The base url to pubmed.
 	var kib = "https://mesh.kib.ki.se/term/";								// The base url to kib.
-	
+
 	// Add the search term to the pubmed url and change whitespace to "+".
 	for(var i = 0; i < searchText.length; i++) {
 		ref = ref + searchText[i];
@@ -601,12 +601,12 @@ function updateDescription() {
 
 	// Search for the definition of the search term and add it to the "definition" panel. Also, add the id to the kib url.
 	for(var i = 0; i < definitions.length; i++) {
-		if(definitions[i].mesh_eng === searchText) {
+		if(definitions[i].mesh_eng.toUpperCase() === searchText.toUpperCase()) {
 			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
 			kib = kib.concat(definitions[i].uniqueID);
 		}
 	}
-	
+
 	// Update the DOM.
 	document.getElementById("pubmed").href = ref;
 	document.getElementById("pubmed").innerHTML = ref;
