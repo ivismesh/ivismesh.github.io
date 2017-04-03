@@ -225,7 +225,8 @@ function collapse(d) {
  	}
 
  	// else if thid d has address shorter than addr
- 	else if(addr.length > d.address.length) {
+ 	//else if(addr.length > d.address.length) {
+	else {
  		let subPath = addr.slice(0, d.address.length);
  		if(d._children) {
  			if(!d.children) d.children = [];
