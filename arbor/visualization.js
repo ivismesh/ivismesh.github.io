@@ -137,7 +137,7 @@ d3.json("data.json", function(error, data) {
 		descToPaths = data;
 
 			// Load the definitions.
-			d3.csv("csvmedsvensk.csv", function(error, data) {
+			d3.csv("csvtest.csv", function(error, data) {
 				definitions = data;
 
 				searchText = decodeURIComponent(window.location.href.split("?searchtext=")[1]).replace(/\+/, ' ');
