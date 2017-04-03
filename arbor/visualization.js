@@ -608,9 +608,10 @@ function updateDescription() {
 		}
 	}
 
+  name = name.concat(" on PubMed");
 	// Update the DOM.
-	document.getElementById("pubmed").href = ref;
-	document.getElementById("synonyms").innerHTML = name.concat(" on PubMed");
+	document.getElementById("synonyms").href = ref;
+	document.getElementById("synonyms").innerHTML = name;
 	document.getElementById("kibki").href = kib;
 	document.getElementById("kibki").innerHTML = "Link to Svensk MeSH";
 }
