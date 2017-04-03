@@ -609,7 +609,9 @@ function updateDescription() {
 
 	// Update the DOM.
 	document.getElementById("pubmed").href = ref;
+	document.getElementById("pubmed").innerHTML = "Link to PubMed";
 	document.getElementById("kibki").href = kib;
+	document.getElementById("kibki").innerHTML = "Link to Svensk MeSH";
 }
 
 
