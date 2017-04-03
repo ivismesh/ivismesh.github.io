@@ -611,7 +611,7 @@ function updateDescription() {
   publinkname = publinkname.concat(" on PubMed");
 	// Update the DOM.
 	document.getElementById("syntext").href = ref;
-	document.getElementById("syntext").innerHTML = name;
+	document.getElementById("syntext").innerHTML = publinkname;
 	document.getElementById("kibki").href = kib;
 	document.getElementById("kibki").innerHTML = "Link to Svensk MeSH";
 }
