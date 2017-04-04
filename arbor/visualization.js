@@ -592,7 +592,7 @@ function treeColor(path) {
 function updateDescription() {
 	var ref = "https://www.ncbi.nlm.nih.gov/pubmed/?term=";					// The base url to pubmed.
 	var kib = "https://mesh.kib.ki.se/term/";								// The base url to kib.
-  var publinkname = "";
+	var publinkname = "";
 	// Add the search term to the pubmed url and change whitespace to "+".
 	for(var i = 0; i < searchText.length; i++) {
 		ref = ref + searchText[i];
@@ -603,11 +603,8 @@ function updateDescription() {
 	for(var i = 0; i < definitions.length; i++) {
 		if(definitions[i].mesh_eng.toUpperCase() === searchText.toUpperCase()) {
 			document.getElementById("description").innerHTML = definitions[i].scope_note_eng;
-      // document.getElementById("svenskdesc").innerHTML = definitions[i].svmesh;
-      // console.log("hi");
-      // console.log(definitions[0].svmesh)
 			kib = kib.concat(definitions[i].uniqueID);
-      publinkname = definitions[i].mesh_eng;
+			publinkname = definitions[i].mesh_eng;
 		}
 	}
 
