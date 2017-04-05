@@ -45,15 +45,31 @@
 					I also created the group's Github and the accompanying webpage, where are visualizations are hosted. This did not take a lot of time, perhaps an hour.</p>
 
 					<h5>Visualization contributions</h5>
-					<p>I have of course attended meetings, both internal, with KI, and with Mario. So in terms of the visualization I have given input and feedback on the design.
-					When it comes to programming I focused on the data; cleaning and putting it into CSV-files. Getting the right data turned out to be harder than I first
+					<p>I have of course attended meetings, both internal, with KI, and with Mario. So in terms of the visualization I have given input and feedback on the design as well as tested the visualization. ???TIME SPENT ON MEETINGS???
+					In the beginning of the project I worked on creating a search function. I also found an ASCII file with all the names and tree numbers of the data. With help from Ana
+					we parsed the file, and this became the basis for the early tree visualization. Later in the project, I continued to focus on the data; cleaning and putting it into CSV-files. Getting the right data turned out to be harder than I first
 					thought. At first I tried to query the data from the MESH website using their SPARQL interface, but after a while I found that the data did not contain the
 					scope notes, which is what we were after (we already had the tree numbers and names from another CSV file). While it might be
 					possible to get the scope-notes using their interface, I found it too difficult given that I have never worked with SPARQL before, and their
 					filesystem was pretty difficult to navigate. Instead, I found an ASCII file with all the relevant information. The only problem was that it was in
 					an ASCII file, so I had to extract the relevant information. I therefore wrote a Java program which uses regular expressions to parse the file
 					and extract whatever information we wanted, and putting that data into a CSV-file. Thus I managed to extract the scope notes from the ASCII-file and
-					use it to provide an info-box in the visualization.</p>
+					use it to provide an info-box in the visualization. We also got a swedish CSV-file with the swedish scope notes. The CSV was however impossible to directly parse in D3,
+				 as it contained ",",";" etc within the text and the names. I therefore modified my code to also read the swedish scope notes, extract these
+			 and then merge them together into at comma separated file with the english scope notes, uniqueIDs and names. </p>
+			 <p>Using the uniqueIDs I also created a link to the swedish MeSH website. In the end we opted for just having the link, and
+			 did not use the swedish scope notes. Toward the end of the project I also fixed some minor bugs and features.
+			 I never wrote down how much time I have spent on the project, so the time spent could be within a very large interval. I think
+			 	time spent on the initial search function and tree data was about 5 hours. Using SPARQL and trying to understand the structure of the data
+				available to us probably took anywhere from 4-10 hours. Writing a Java program, parsing the files and creating CSV-files, then
+				fixing bugs related to these probably took anywhere from 10 to 40 hours. I would guess somewhere around 25 hours though. Some of
+					time was spent coding during meetings and while commuting to and from school, which is why it is so hard to estimate the time spent.
+					Overall that would put my individual contribution (excluding all the time spent in meetings) at :??????
+				</p>
+				<h5>Other work</h5>
+				At the first presentation I worked on and created the initial powerpoint (which Ana then changed for the presentation). I also took notes
+				during and after the presentation. Unfortunately I had an exam at the same time as the final presentation, so I could not attend that one.
+
 
 
 					<p>Some more text</p>
@@ -69,3 +85,4 @@
 		<script type="text/javascript" src="script.js"></script>
 	</body>
 </html>
+
