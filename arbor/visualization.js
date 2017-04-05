@@ -270,7 +270,7 @@ function update(source) {
 
 	// Normalize for fixed-depth.
 	nodes.forEach(function(d) {
-		d.y = d.depth * 350;
+		d.y = d.depth * 335;
 	});
 
 	// Update the nodes.
@@ -337,7 +337,7 @@ function update(source) {
 				return -20
 			}
 			else {
-				return 250;
+				return 20;
 			}
 		})
 		.attr("dx", function(d) {					// Offset the text at searched nodes so it doesn't overlap the larger nodes.
@@ -355,7 +355,7 @@ function update(source) {
 		.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
 		.attr('class', d => d.name.length < 18 ? 'fulltext' : 'shorttext')
 		.text(function(d) {
-			return d.name.length < 40 ? d.name : d.name.slice(0, 39);
+			return d.name.length < 20 ? d.name : d.name.slice(0, 19);
 		})
 		.style("fill-opacity", 1e-6)
 		.style("font-weight", function(d) {			// Make searched nodes have bold text.
@@ -367,12 +367,12 @@ function update(source) {
 		})
 		.attr("opacity", function(d) {if(d.depth === 0) return 0; else return 1;}) // Hide first level.
 		.on('mouseover', function(d) {
-			if(d.name.length > 40) {
+			if(d.name.length > 19) {
 				d3.select(this).text(d => d.name);
 			}
 		})
 		.on('mouseout', function(d) {
-			d3.select(this).text(d => d.name.slice(0, 39));
+			d3.select(this).text(d => d.name.slice(0, 19));
 		})
 		.on('click', function(d) {
 			window.location.href = "/arbor/?searchtext=" + d.name;
