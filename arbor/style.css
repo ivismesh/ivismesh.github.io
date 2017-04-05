@@ -97,6 +97,11 @@ form {
   stroke-linejoin: miter;
 }
 
+.node text:hover{
+	text-decoration: underline;
+	fill: #337ab7;
+}
+
 .node {
   cursor: pointer;
 }

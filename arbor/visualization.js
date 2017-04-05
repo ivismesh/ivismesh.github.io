@@ -334,10 +334,10 @@ function update(source) {
 				return -25;
 			}
 			else if(d.children || d._children) {
-				return -10
+				return -20
 			}
 			else {
-				return 10;
+				return 250;
 			}
 		})
 		.attr("dx", function(d) {					// Offset the text at searched nodes so it doesn't overlap the larger nodes.
