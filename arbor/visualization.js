@@ -334,10 +334,10 @@ function update(source) {
 				return -25;
 			}
 			else if(d.children || d._children) {
-				return -20
+				return -15
 			}
 			else {
-				return 20;
+				return 15;
 			}
 		})
 		.attr("dx", function(d) {					// Offset the text at searched nodes so it doesn't overlap the larger nodes.
@@ -355,7 +355,12 @@ function update(source) {
 		.attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
 		.attr('class', d => d.name.length < 18 ? 'fulltext' : 'shorttext')
 		.text(function(d) {
-			return d.name.length < 20 ? d.name : d.name.slice(0, 19);
+			if(d.depth === 1) {
+				return d.name.length < 40 ? d.name : d.name.slice(0, 39);
+			} else {
+				return d.name.length < 20 ? d.name : d.name.slice(0, 19);			// Make text shorter for not category names
+			}
+
 		})
 		.style("fill-opacity", 1e-6)
 		.style("font-weight", function(d) {			// Make searched nodes have bold text.
