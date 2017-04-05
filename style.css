@@ -39,6 +39,7 @@ h5 {
   background-image: url(../img/header.jpg) no-repeat center center;
   background-size: cover;
   position: relative;
+  padding-top: 50px;
 }
 
 .header-content {

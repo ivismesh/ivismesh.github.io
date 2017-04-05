@@ -7,8 +7,8 @@ var i = 0,
 	root,
 	descToPaths,
 	searchText,			// The search term. This has to be updated when a new search is made.
-	nodeSize = 4.5,		// The size of each node.
-	goalNodeSize = 8;	// The size of the nodes representing the search term.
+	nodeSize = 8,		// The size of each node.
+	goalNodeSize = 10;	// The size of the nodes representing the search term.
 
 var doScaleAndCenter = true;	// Determines if the tree should be scaled and centered on screen.
 
@@ -29,11 +29,11 @@ var zoom = d3.behavior.zoom()
 
 // Main canvas.
 var svg = d3.select("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-	.call(zoom)
-  .append("g")
-	.attr("id", "container")
+	  .attr("width", width + margin.right + margin.left)
+	  .attr("height", height + margin.top + margin.bottom)
+		.call(zoom)
+	  .append("g")
+		.attr("id", "container")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // Zoom translate and scale.
