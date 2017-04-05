@@ -32,6 +32,23 @@ h5 {
 	margin: 0px;
 }
 
+.header {
+  width: 100%;
+  min-height: 100vh;
+  text-align: center;
+  background-image: url(../img/header.jpg) no-repeat center center;
+  background-size: cover;
+  position: relative;
+}
+
+.header-content {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+  transform: translate(-50%, -50%)
+}
+
 .bg-green {
 	background-color: #b0ca3b;
 }
@@ -40,8 +57,12 @@ h5 {
   padding: 60px 50px 50px 50px;
  }
 
- .container-body {
- 	padding: 50px 0 50px 0px;
+.container-body {
+ 	padding: 30px 0 50px 0px;
+ }
+
+.footer {
+ 	padding: 50px 0px;
  }
 
 .navbar {
@@ -128,4 +149,13 @@ form {
 
 p {
   margin: 0.5em;
+}
+
+.two-columns{
+    -webkit-column-gap: 20px;
+       -moz-column-gap: 20px;
+            column-gap: 20px;
+    -webkit-column-count: 2;
+       -moz-column-count: 2;
+            column-count: 2;
 }

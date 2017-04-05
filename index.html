@@ -30,40 +30,55 @@
 		  </div>
 		</nav>
 
-		<!-- ABOUT THE PROJECT -->
-		<div class="container-top bg-green" id="about">
-			<div class="row">
-								<div class="col-lg-8 col-lg-offset-2 text-center">
-					<h1>About the Project</h1>
-					<p>
-						Arbor is a visualization of the MeSH database. MeSH is a thesaurus containing several thousand medical terms.
-						<h5>Background</h5>
-						<p>Whitin the medical field, anyone from students to doctors has to look up the meaning of certain medical terms.
-						These same terms are also used as keywords when searching for published papers on ???medline???, an enormous database
-					of medical papers. Therefore it is very important for people whitin the medical field to be able to not only look up
-				a medical term, but also see that terms' ?? synonyms, broader- and narrower terms etc. Easily finding these ???correlated??? terms
-				is crucial for effectively searching the medline?? database. The problem with the current MeSH webpage is that it is
-			solely text-based, and it makes correlations and samband???? difficult to spot. Our task was therefore to visualize the database,
-		to make it easier to find the right terms.</p>
-					
-					<h5>Tillvägagångssätt????</h5>
-					<p>D3.js was used to visualize the database. As the database followed a tree-structure, a tree was uppenbar???? apparrent? visualization. We used
-						some D3.js examples, and then modified it heavily to conform to our ideas. We collected data from various files on
-						the MeSH international webpage, and cleaned them into CSV-files which was then parsed to create the tree-visualization.
-						</p>
-						<h5>Problems???</h5>
-						The structure of the data was not an actual tree, but rather several trees, where some nodes were present in several of the trees.
-						This imposed a problem as most D3 examples were of a single tree or a directed graph, neither of which conformed?? to the data structure.
-						We solved that by ????creating an invisible parent node????myabe not take this part???
-						
+		<!-- HEADER -->
+		<div class="header">
+			<div class="header-content">
+			<h1>Arbor</h1>
+			<p>BIG IMAGE + LINK TO VIDEO</p>
+		</div>
+		</div>
 
+		<!-- LINK TO PROJECT -->
+		<div class="container-body" id="project">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 text-center">
+					<h1>The Arbor Application</h1>
+					- LINK TO PROJECT -
 				</div>
 			</div>
 		</div>
 
+		<!-- ABOUT THE PROJECT -->
+		<div class="container-body bg-green" id="about">
+			<div class="row">
+				<div class="col-lg-8 col-lg-offset-2 text-center">
+					<h1>About the Project</h1>
+					<p>
+						<div class="two-columns">
+						Arbor is a visualization of the MeSH database. MeSH is a thesaurus containing several thousand medical terms.
+						<h5>Background</h5>
+						<p>Whitin the medical field, anyone from students to doctors has to look up the meaning of certain medical terms. These same terms are also used as keywords when searching for published papers on ???medline???, an enormous database of medical papers. Therefore it is very important for people whitin the medical field to be able to not only look up a medical term, but also see that terms' ?? synonyms, broader- and narrower terms etc. Easily finding these ???correlated??? terms is crucial for effectively searching the medline?? database. The problem with the current MeSH webpage is that it is solely text-based, and it makes correlations and samband???? difficult to spot. Our task was therefore to visualize the database,to make it easier to find the right terms.</p>
+					
+						<h5>Tillvägagångssätt????</h5>
+						<p>D3.js was used to visualize the database. As the database followed a tree-structure, a tree was uppenbar???? apparrent? visualization. We used
+						some D3.js examples, and then modified it heavily to conform to our ideas. We collected data from various files on
+						the MeSH international webpage, and cleaned them into CSV-files which was then parsed to create the tree-visualization.
+						</p>
+
+						<h5>Problems???</h5>
+						<p>The structure of the data was not an actual tree, but rather several trees, where some nodes were present in several of the trees.
+						This imposed a problem as most D3 examples were of a single tree or a directed graph, neither of which conformed?? to the data structure.
+						We solved that by ????creating an invisible parent node????myabe not take this part???</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
 		<!-- TEAM -->
-		<div id="team" class="container-body text-center">
+		<div class="container-body text-center"  id="team" >
 		  <h1>Team</h1>
+		  <br/>
 		  <!-- 1st row -->
 		  <div class="row">
 		  	<div class="col-lg-10 col-lg-offset-1">
@@ -71,19 +86,16 @@
 				    <div class="col-sm-4">
 				     	<div class="dev-image" style="background-image: url('img/ana.jpg');"></div>
 				      <h4>Ana Yankova</h4>
-				      <p>About</p>
 				      <a href="mailto:anahr@kth.se">anahr@kth.se</a>
 				    </div>
 				    <div class="col-sm-4">
 				      <div class="dev-image" style="background-image: url('img/andreas.jpg');"></div>
 				      <h4>Andreas Hahr</h4>
-				      <p>About</p>
 				      <a href="mailto:hahr@kth.se">hahr@kth.se</a>
 				    </div>
 				    <div class="col-sm-4">
 				      <div class="dev-image" style="background-image: url('img/christoffer.jpg'); background-size: 190%; background-position: -75px -10px;"></div>
 				      <h4>Christoffer Neppare</h4>
-				      <p>About</p>
 				      <a href="mailto:neppare@kth.se">neppare@kth.se</a>
 				    </div>
 				  </div>
@@ -92,25 +104,21 @@
 				    <div class="col-sm-3">
 				      <div class="dev-image" style="background-image: url('img/joel.jpg'); background-size: 100%; background-position: 10px -20px;"></div>
 				      <h4>Joel Ekelöf</h4>
-				      <p>About</p>
 				      <a href="mailto:joeleke@kth.se">joeleke@kth.se</a>
 				    </div>
 				    <div class="col-sm-3">
 				      <div class="dev-image" style="background-image: url('img/jonatan.jpg'); background-size: 180%; background-position: -105px -105px;"></div>
 				      <h4>Jonatan Cöster</h4>
-				      <p>About</p>
 				      <a href="mailto:jonatanc@kth.se">jonatanc@kth.se</a>
 				    </div>
 				    <div class="col-sm-3">
 				      <div class="dev-image" style="background-image: url('img/lili.png'); background-position: 0px -30px;"></div>
 				      <h4>Lili Du</h4>
-				      <p>About</p>
 				      <a href="mailto:lilid@kth.se">lilid@kth.se</a>
 				    </div>
 				    <div class="col-sm-3">
 				      <div class="dev-image" style="background-image: url('img/sugandh.jpg'); background-size: 150%; background-position: -45px -10px;"></div>
 				      <h4>Sugandh Sinha</h4>
-				      <p>About</p>
 				      <a href="mailto:sugandh@kth.se">sugandh@kth.se</a>
 				    </div>
 				  </div>
@@ -119,8 +127,8 @@
 		</div>
 
 		<!-- FOOTER -->
-		<footer class="container-body text-center">
-			Some footer ~
+		<footer class="footer text-center">
+			Copyright © Arbor 2017
 		</footer>
 
 
