@@ -58,18 +58,14 @@
 						<div class="two-columns">
 						Arbor is a visualization of the MeSH database. MeSH is a thesaurus containing several thousand medical terms.
 						<h5>Background</h5>
-						<p>Whitin the medical field, anyone from students to doctors has to look up the meaning of certain medical terms. These same terms are also used as keywords when searching for published papers on ???medline???, an enormous database of medical papers. Therefore it is very important for people whitin the medical field to be able to not only look up a medical term, but also see that terms' ?? synonyms, broader- and narrower terms etc. Easily finding these ???correlated??? terms is crucial for effectively searching the medline?? database. The problem with the current MeSH webpage is that it is solely text-based, and it makes correlations and samband???? difficult to spot. Our task was therefore to visualize the database,to make it easier to find the right terms.</p>
+						<p>Whitin the medical field, anyone from students to doctors has to look up the meaning of certain medical terms. These same terms are also used as keywords when searching for published papers on Medline, an enormous database of medical papers. Therefore it is very important for people whitin the medical field to be able to not only look up a medical term, but also see that terms' synonyms, broader- and narrower terms etc. Easily finding these connected terms is crucial for effectively searching the Medline database. The problem with the current MeSH webpage is that it is solely textbased, and it makes correlations and connections difficult to spot. Our task was therefore to visualize the database,to make it easier to find the right terms.</p>
 					
-						<h5>Tillvägagångssätt????</h5>
-						<p>D3.js was used to visualize the database. As the database followed a tree-structure, a tree was uppenbar???? apparrent? visualization. We used
+						<h5>Course of action</h5>
+						<p>D3.js was used to visualize the database. As the database followed a tree-structure, a tree was an obvious choice for the visualization. We used
 						some D3.js examples, and then modified it heavily to conform to our ideas. We collected data from various files on
 						the MeSH international webpage, and cleaned them into CSV-files which was then parsed to create the tree-visualization.
 						</p>
 
-						<h5>Problems???</h5>
-						<p>The structure of the data was not an actual tree, but rather several trees, where some nodes were present in several of the trees.
-						This imposed a problem as most D3 examples were of a single tree or a directed graph, neither of which conformed?? to the data structure.
-						We solved that by ????creating an invisible parent node????myabe not take this part???</p>
 					</div>
 				</div>
 			</div>
