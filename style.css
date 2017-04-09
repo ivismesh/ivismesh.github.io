@@ -36,10 +36,20 @@ h5 {
   width: 100%;
   min-height: 100vh;
   text-align: center;
-  background-image: url(../img/header.jpg) no-repeat center center;
+  background-image: url("https://puu.sh/veRQs/d1f08116f8.png") no-repeat center center;
   background-size: cover;
   position: relative;
   padding-top: 50px;
+}
+
+.btn-primary {
+	background-color: #b0ca3b;
+	border-color: #b0ca3b;
+}
+
+.btn-primary:hover, .btn-primary:active {
+	background-color: #b0ca3b;
+	border-color: #b0ca3b;
 }
 
 .header-content {
